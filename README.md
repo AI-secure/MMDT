@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ### Download MMDT dataset
 
-We provide our dataset at [this URL](). Please unzip the file and put the folder at the repository root `./data`. The directory will look like:
+We provide our dataset at [this URL](https://drive.google.com/file/d/1-pMTtPOOjH2nAXirdGzt4o_NlHv5K3Ge/view?usp=sharing). Please unzip the file and put the folder at the repository root `./data`. The directory will look like:
 
 ```
 .
@@ -61,7 +61,7 @@ bash script/hallucination.sh
 + Follow the specific `README`: Every subdirectory has its own README. Refer to these documents for information on how to run the scripts and interpret the results.
 
 ## License
-This project is licensed under the [CC BY 4.0]("https://creativecommons.org/licenses/by/4.0/legalcode")  - see the LICENSE file for details.
+This project is licensed under the [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/legalcode)  - see the LICENSE file for details.
 
 ## Contact
 Please reach out to us if you have any questions or suggestions. You can submit an issue or pull request, or send an email to chejian2@illinois.edu.
