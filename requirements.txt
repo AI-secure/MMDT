@@ -1,0 +1,13 @@
+transformers
+diffusers
+datasets
+accelerate
+google-generativeai
+anthropic
+openai
+sentencepiece 
+scikit-learn
+shortuuid
+opencv-python
+spacy
+-e git+https://github.com/openai/CLIP.git@main#egg=clip
