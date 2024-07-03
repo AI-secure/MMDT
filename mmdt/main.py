@@ -1,6 +1,6 @@
 import argparse
 from importlib import import_module
-from summarize import summarize_results
+from mmdt.summarize import summarize_results
 
 
 PERSPECTIVES = ["safety", "hallucination", "fairness", "privacy", "adv", "ood"]
