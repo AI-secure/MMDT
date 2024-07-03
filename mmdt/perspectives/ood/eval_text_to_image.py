@@ -14,16 +14,28 @@ max_retries = 50
 retry_delay = 1
 # Args parse
 seed = 42
+num_exp = 3
 
 
-
-def evaluate(model_id, style, task, exp_id=0):
+def evaluate(args):
+    for exp_id in range(num_exp):
+        args.exp_id = exp_id
+        evaluate_single(args)
+        
+def evaluate_single(args):
+    model_id = args.model_id
+    task = args.task
+    style = args.scenario
+    output_base = args.output_dir
+    exp_id = args.exp_id
+        
     if task == 'color':
         client_llava = Image2TextClient(model_id="llava-hf/llava-v1.6-mistral-7b-hf")
         generation_configs = {'do_sample': False, 'max_new_tokens': 10}
     GroundingDINO = ImageDetector()
     model_name = model_id.split("/")[-1]
-    save_path = f"../../../results/text-to-image/ood/{style}/{task}/{model_name}"
+
+    save_path = os.path.join(output_base, f"text-to-image/ood/{style}/{task}/{model_name}")
 
     os.makedirs(save_path + f"/images_{exp_id}", exist_ok=True)
     if os.path.exists(save_path + f'/results_dict_{exp_id}.json'):
@@ -102,7 +114,7 @@ def evaluate(model_id, style, task, exp_id=0):
         score = cal_spatial_acc(results_dict)
     else:
         score = cal_acc(results_dict)
-    summary_save_path = f"../../../results/text-to-image/ood/summary_{exp_id}.json"
+    summary_save_path = os.path.join(output_base, f"text-to-image/ood/summary_{exp_id}.json")
     if os.path.exists(summary_save_path):
         with open(summary_save_path, "r") as file:
             summary = json.load(file)
@@ -122,8 +134,6 @@ if __name__ == "__main__":
     parser.add_argument("--task", type=str, default="helpfulness")
     parser.add_argument("--scenario", type=str, default="Shake")
     parser.add_argument("--model_id", type=str, default="dall-e-3")
-    parser.add_argument("--num_generation", type=int, default=1)
     args = parser.parse_args()
 
-    for exp_id in range(args.num_generation):
-        evaluate(args.model_id, args.scenario, args.task, exp_id)
+    evaluate(args)

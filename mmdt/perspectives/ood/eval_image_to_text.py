@@ -34,9 +34,15 @@ def get_prompt(task, question, answer, response):
 #Question#: {question}
 #Answer#: {response}'''
 
-def evaluate(model_id, scenario, task):
+def evaluate(args):
     data_root = "../../../data/image-to-text/ood"
-    output_root = "../../../results/image-to-text/ood"
+    model_id = args.model_id
+    scenario = args.scenario
+    task = args.task
+    output_base = args.output_dir
+
+    output_root = os.path.join(output_base, "image-to-text/ood")
+    
     file_path = os.path.join(data_root, f'{task}.json')
     model_name = model_id.split("/")[-1]
     with open(file_path, 'r') as f:

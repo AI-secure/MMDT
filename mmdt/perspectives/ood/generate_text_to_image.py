@@ -12,14 +12,24 @@ max_retries = 50
 retry_delay = 1
 # Args parse
 seed = 42
+num_exp = 3
 
 
+def generate(args):
+    for exp_id in range(num_exp):
+        args.exp_id = exp_id
+        generate_single(args)
 
-def generate(model_id, style, task, exp_id=0):
+def generate_single(args):
+    model_id = args.model_id
+    task = args.task
+    style = args.scenario
+    exp_id = args.exp_id
+    output_base = args.output_dir
     with open(f'../../../data/text-to-image/ood/{task}.json', 'r') as file:
         data_all = json.load(file)
     model_name = model_id.split("/")[-1]
-    save_path = f"../../../results/text-to-image/ood/{style}/{task}/{model_name}"
+    save_path = os.path.join(output_base, f"text-to-image/ood/{style}/{task}/{model_name}")
 
     os.makedirs(save_path + f"/images_{exp_id}", exist_ok=True)
     if os.path.exists(save_path + f'/results_dict_{exp_id}.json'):
@@ -74,8 +84,6 @@ if __name__ == "__main__":
     parser.add_argument("--task", type=str, default="helpfulness")
     parser.add_argument("--scenario", type=str, default="Shake")
     parser.add_argument("--model_id", type=str, default="dall-e-3")
-    parser.add_argument("--num_generation", type=int, default=1)
     args = parser.parse_args()
 
-    for exp_id in range(args.num_generation):
-        generate(args.model_id, args.scenario, args.task, exp_id)
+    generate(args)
