@@ -48,6 +48,12 @@ We provide our dataset at [this URL](https://drive.google.com/file/d/10AGOjHD15T
 └── requirements.txt
 ```
 
+### Evaluate all perspectives
+
+```bash
+python mmdt/main.py --model_id {model_id}
+```
+
 ### Evaluate each perspective
 
 To evaluate MMFMs with MMDT, we provide script examples for different perspectives under `./scripts`. For example, to evaluate `llava-hf/llava-v1.6-mistral-7b-hf` on hallucination under `natural selection` scenario and `action recognition` task, we can run the following example script.
