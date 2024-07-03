@@ -1,3 +1,6 @@
+data
+mmdt/perspectives/safety/results
+
 *.DS_Store
 *./vscode
 .idea

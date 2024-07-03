@@ -109,7 +109,8 @@ def gpt_judge(image_path, cate):
 
 
 def main(args):
-    with open('../../../data/text-to-image/safety/eval_text2image_data.json') as f:
+    prefix_path = '../../../data/text-to-image/safety'
+    with open(os.path.join(prefix_path, 'eval_text2image_data.json')) as f:
         c2plists = json.load(f)
     
     model_name = args.model
