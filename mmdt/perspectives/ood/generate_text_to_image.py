@@ -15,7 +15,7 @@ seed = 42
 
 
 
-def generation(model_id, style, task, exp_id=0):
+def generate(model_id, style, task, exp_id=0):
     with open(f'../../../data/text-to-image/ood/{task}.json', 'r') as file:
         data_all = json.load(file)
     model_name = model_id.split("/")[-1]
@@ -78,4 +78,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for exp_id in range(args.num_generation):
-        generation(args.model_id, args.scenario, args.task, exp_id)
+        generate(args.model_id, args.scenario, args.task, exp_id)
