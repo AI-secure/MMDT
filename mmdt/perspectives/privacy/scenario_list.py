@@ -4,6 +4,6 @@ scenario_list = {
     },
     "image_to_text": {
         "pii": ["age",""],
-        "location": [],
+        "location": ["Pri-SV-with-text","Pri-SV-without-text","Pri-4Loc-SV-with-text","Pri-4Loc-SV-without-text"],
     },
 }
