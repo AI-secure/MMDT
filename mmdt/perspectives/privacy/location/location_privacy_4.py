@@ -84,8 +84,8 @@ def sort_filenames(directory_path):
 
 def evaluate_location_4(model_id,task):
     task_to_path = {
-        "Pri-4Loc-SV-with-text": "Dataset-3-group_no_text_feature",
-        "Pri-4Loc-SV-without-text": "Dataset-3-group_text_feature"
+        "Pri-4Loc-SV-with-text": "Dataset-3-group_text_feature",
+        "Pri-4Loc-SV-without-text": "Dataset-3-group_no_text_feature"
     }
     if task in task_to_path:
         image_path = task_to_path[task]

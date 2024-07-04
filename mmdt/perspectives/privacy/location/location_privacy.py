@@ -11,6 +11,7 @@ for path in sys.path:
     print(path)
 from models import Image2TextClient
 from .location_privacy_4 import evaluate_location_4
+from .calculate_acc_rej import calculate_acc_rej
 from tqdm import tqdm
 import json
 import re
@@ -86,6 +87,7 @@ def evaluate_location_1(model_id,task):
 def evaluate_location(model_id,task):
     if task in ["Pri-4Loc-SV-with-text", "Pri-4Loc-SV-without-text"]:
         evaluate_location_4(model_id, task)
+        calculate_acc_rej()
     else:
         evaluate_location_1(model_id, task)
-    
+        calculate_acc_rej()
