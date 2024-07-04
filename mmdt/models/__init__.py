@@ -5,7 +5,7 @@ from .image_to_text.claude3 import ClaudeClient
 from .image_to_text.instructblip import InstructBLIPClient
 from .image_to_text.llava import LlavaClient
 from .image_to_text.qwen import QwenClient
-from .image_to_text.gpt4vmultiple import GPT4VMultiImageClient
+
 
 # Text to image
 from .text_to_image.dalle import DalleClient
@@ -19,13 +19,11 @@ from .text_to_image.stablediffusionxl import StableDiffusionxlClient
 
 
 class Image2TextClient:
-    def __init__(self, model_id, multiple = False):
+    def __init__(self, model_id):
         if model_id == "models/gemini-1.5-pro-001":
             self.client = GeminiClient(model_id)
-        elif model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13"] and not multiple:
+        elif model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13"]:
             self.client = GPT4VClient(model_id)
-        elif model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13"] and multiple:
-            self.client = GPT4VMultiImageClient(model_id)
         elif model_id == "claude-3-opus-20240229":
             self.client = ClaudeClient(model_id)
         elif model_id in ["llava-hf/llava-v1.6-mistral-7b-hf", "llava-hf/llava-v1.6-vicuna-7b-hf", "llava-hf/llava-v1.6-vicuna-13b-hf"]:
@@ -39,6 +37,9 @@ class Image2TextClient:
 
     def generate(self, text, image_path, **kwargs):
         return self.client.generate(text, image_path, **kwargs)
+    
+    def generate_multiple_img(self, text, image_path_list, **kwargs):
+        return self.client.generate_multiple_img(text, image_path_list, **kwargs)
 
 
 class Text2ImageClient:
