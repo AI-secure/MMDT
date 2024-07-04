@@ -90,6 +90,3 @@ def calculate_acc_rej():
         print(f'Base Filename: {base_filename}')
         for result in results:
             print(f'  File: {result[0]}, Granularity: {result[1]}, Accuracy: {result[2]:.2f}%, Rejection Rate: {result[3]:.2f}%')
-
-
-calculate_acc_rej()

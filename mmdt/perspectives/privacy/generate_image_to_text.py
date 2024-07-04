@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 import argparse
 from PIL import Image
-from location.calculate_acc_rej import calculate_acc_rej
+from location.generate_response_location_privacy import *
 
 
 if __name__ == '__main__':
@@ -14,6 +14,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if(args.scenario=="location"):
-        calculate_acc_rej()# analyse all the response file
-        
+        if args.task in ["Pri-4Loc-SV-with-text", "Pri-4Loc-SV-without-text"]:
+            generate_response_4img(args.model_id, args.task)
+        elif args.task in ["Pri-SV-with-text","Pri-SV-without-text"]:
+            generate_response_1img(args.model_id, args.task)
     #else PII
