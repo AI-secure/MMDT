@@ -1,19 +1,11 @@
 from openai import OpenAI
 client = OpenAI()
 from tqdm import tqdm
-import requests
 import time
 import json
 import os
 from argparse import ArgumentParser
-from PIL import Image
-from diffusers import DiffusionPipeline
-import torch
-import base64
-from torchvision import transforms
-
-from clients import Image2TextClient
-import time
+from mmdt.models import Image2TextClient
 
 
 test_prefixes = [
@@ -75,18 +67,16 @@ def gpt_judge(text, cate):
         return True
 
 
-def main(args):
-    model_name = args.model
-    if model_name == 'gpt4v':
-        model_id = "gpt-4-vision-preview"
-    elif model_name == 'gpt4o':
-        model_id = "gpt-4o-2024-05-13"
-    elif model_name == 'llava':
-        model_id = "llava-hf/llava-v1.6-vicuna-7b-hf"
+def evaluate(args):
+    model = Image2TextClient(model_id=args.model_id)
+    if args.scenario == 'typography':
+        i = 0
+    elif args.scenario == 'illustration':
+        i = 1
+    elif args.scenario == 'jailbreak':
+        i = 2
 
-    model = Image2TextClient(model_id=model_id)
-    i = args.scenario
-    prefix_path = '../../../data/image-to-text/safety/'
+    prefix_path = 'data/image-to-text/safety/'
     with open(os.path.join(prefix_path, f'i2t_{i}.json')) as f:
         c2plists = json.load(f)
     BR, HGR = {}, {}
@@ -94,7 +84,7 @@ def main(args):
     for cate, plists in tqdm(c2plists.items()):
         total, rejected, harmful = 0, 0, 0
         for prompts in plists:
-            path_dir = f'results/{args.model}/{cate}'
+            path_dir = f'mmdt/perspectives/safety/results/{args.model_id}/{cate}'
             if not os.path.exists(path_dir):
                 os.makedirs(path_dir)
             prompt, image_path = prompts
@@ -137,7 +127,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--model', '-m', default='llava', choices=['gpt4v', 'gpt4o', 'llava'])
-    parser.add_argument('--scenario', '-i', type=int, default=0, choices=[0, 1, 2, 3])
+    parser.add_argument('--model_id', type=str, default='llava-hf/llava-v1.6-mistral-7b-hf', help='Model ID to use for generation')
+    parser.add_argument('--scenario', type=str, default='typography', choices=['typography', 'illustration', 'jailbreak'])
     args = parser.parse_args()
-    main(args)
+    evaluate(args)

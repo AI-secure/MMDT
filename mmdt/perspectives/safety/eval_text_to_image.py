@@ -24,7 +24,7 @@ def text2image(text, model, model_name):
         - succ: whether the generation is successful
         - image: returned PIL image
     '''
-    if model_name == 'dalle2':
+    if model_name == 'dall-e-2':
         succ = True
         try:
             response = client.images.generate(
@@ -42,7 +42,7 @@ def text2image(text, model, model_name):
             succ = False
             image = None
         time.sleep(1)
-    elif model_name == 'dalle3':
+    elif model_name == 'dall-e-3':
         succ = True
         try:
             response = client.images.generate(
@@ -108,12 +108,12 @@ def gpt_judge(image_path, cate):
             return False
 
 
-def main(args):
-    prefix_path = '../../../data/text-to-image/safety'
+def evaluate(args):
+    prefix_path = 'data/text-to-image/safety'
     with open(os.path.join(prefix_path, 'eval_text2image_data.json')) as f:
         c2plists = json.load(f)
     
-    model_name = args.model
+    model_name = args.model_id
     if model_name == 'sd-xl':
         model_id = "stabilityai/stable-diffusion-xl-base-1.0"
         model = DiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
@@ -133,30 +133,36 @@ def main(args):
     else:
         model = None
 
-    for i in [2]:
-        BR, HGR = {}, {}
-        for cate, plists in tqdm(c2plists.items()):
-            total, rejected, harmful = 0, 0, 0
-            for inst, prompts in enumerate(plists):
-                path_dir = f'results/{args.model}/{cate}/{inst}'
-                if not os.path.exists(path_dir):
-                    os.makedirs(path_dir)
-                prompt = prompts[i]
-                succ, image = text2image(prompt, model, model_name)
-                if succ:
-                    image_path = os.path.join(path_dir, prompt[:50]+f'_{i}'+'.jpg')
-                    image.save(image_path)
-                    harm = gpt_judge(image_path, cate)
-                    if harm:
-                        harmful += 1
-                else:
-                    rejected += 1
-                total += 1
-                    
-            bypass_rate = 1 - rejected/total
-            harmful_content_generation_rate = harmful / total
-            BR[cate] = bypass_rate
-            HGR[cate] = harmful_content_generation_rate
+    if args.scenario == 'vanilla':
+        i = 0
+    elif args.scenario == 'transformed':
+        i = 1
+    elif args.scenario == 'jailbreak':
+        i = 2
+
+    BR, HGR = {}, {}
+    for cate, plists in tqdm(c2plists.items()):
+        total, rejected, harmful = 0, 0, 0
+        for inst, prompts in enumerate(plists):
+            path_dir = f'mmdt/perspectives/safety/results/{args.model_id}/{cate}/{inst}'
+            if not os.path.exists(path_dir):
+                os.makedirs(path_dir)
+            prompt = prompts[i]
+            succ, image = text2image(prompt, model, model_name)
+            if succ:
+                image_path = os.path.join(path_dir, prompt[:50]+f'_{i}'+'.jpg')
+                image.save(image_path)
+                harm = gpt_judge(image_path, cate)
+                if harm:
+                    harmful += 1
+            else:
+                rejected += 1
+            total += 1
+                
+        bypass_rate = 1 - rejected/total
+        harmful_content_generation_rate = harmful / total
+        BR[cate] = bypass_rate
+        HGR[cate] = harmful_content_generation_rate
         print(f'----------BEGIN SCENARIO {i}----------')
         print('BR:', BR)
         print('HGR: ', HGR)
@@ -170,6 +176,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--model', '-m', default='sd-xl', choices=['dalle2', 'dalle3', 'sd-xl', 'dreamlike', 'openjourney', 'if-i-m'])
+    parser.add_argument('--model_id', type=str, default='dall-e-2')
+    parser.add_argument('--scenario', type=str, default='vanilla', choices=['vanilla', 'transformed', 'jailbreak'])
     args = parser.parse_args()
-    main(args)
+    evaluate(args)

@@ -6,7 +6,7 @@ from mmdt.summarize import summarize_results
 PERSPECTIVES = ["safety", "hallucination", "fairness", "privacy", "adv", "ood"]
 KNOWN_MODEL_MODALITY = {
     "text_to_image": ["dall-e-2", "dall-e-3", "DeepFloyd/IF-I-M-v1.0", "dreamlike-art/dreamlike-photoreal-2.0",
-                      "kandinsky-community/kandinsky-3", "dataautogpt3/OpenDalleV1.1""prompthero/openjourney-v4",
+                      "kandinsky-community/kandinsky-3", "dataautogpt3/OpenDalleV1.1", "prompthero/openjourney-v4",
                       "stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-xl-base-1.0"],
     "image_to_text": ["models/gemini-1.5-pro-001", "gpt-4-vision-preview", "gpt-4o-2024-05-13",
                       "claude-3-opus-20240229", "llava-hf/llava-v1.6-mistral-7b-hf", "llava-hf/llava-v1.6-vicuna-7b-hf",
