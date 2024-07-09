@@ -6,6 +6,7 @@ from mmdt.models import Image2TextClient
 from mmdt.detection import ImageDetector
 from .utils import determine_relative_position
 from PIL import Image
+from scenario_list import all_scenarios
 
 def evaluate(model_id, scenario, task):
     """ Main function to perform image evaluations. """
@@ -14,7 +15,7 @@ def evaluate(model_id, scenario, task):
     file = pd.read_csv(file_path)
     img_ids = file['img_id'].tolist()
 
-    output_dir = os.path.join('../../results/text_to_image/hallucination', scenario, task, model_id)
+    output_dir = os.path.join('../../results/text_to_image/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize clients or detectors based on the task
@@ -32,7 +33,7 @@ def evaluate(model_id, scenario, task):
 
     # Save the results to a CSV file
     df_results = pd.DataFrame(results)
-    result_file = os.path.join(output_dir, 'evaluation_results.csv')
+    result_file = os.path.join(output_dir, 'evaluation.csv')
     df_results.to_csv(result_file, index=False)
 
 def evaluate_task(model, client, file, img_id, image_path, task, generation_configs=None):
@@ -65,11 +66,18 @@ def evaluate_spatial_relationships(model, objects, relations, image_path):
         'accuracy': accuracy
     }
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for evaluation')
-    parser.add_argument('--scenario', type=str, default="natural", help='Specify the scenario')
-    parser.add_argument('--task', type=str, default="identification", help='Specify the task to execute')
+    parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for generation')
+    parser.add_argument('--scenario', type=str, help='Scenario type')
+    parser.add_argument('--task', type=str, help='Task to be executed')
     args = parser.parse_args()
 
-    evaluate(args.model_id, args.scenario, args.task)
+    text_to_image_scenarios = all_scenarios['text_to_image']
+
+    if args.scenario is None or args.task is None:
+        for scenario, tasks in text_to_image_scenarios.items():
+            for task in tasks:
+                evaluate_responses(args.model_id, scenario, task)
+    else:
+        evaluate_responses(args.model_id, args.scenario, args.task)

@@ -5,6 +5,7 @@ import argparse
 from PIL import Image
 from collections import Counter
 from utils import LLMChat
+from scenario_list import all_scenarios
 
 def extract_counts_as_list(response, objects):
     import re
@@ -22,14 +23,14 @@ def extract_counts_as_list(response, objects):
 
 def evaluate(model_id, scenario, task):
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    file_path = os.path.join('../../data/image_to_text', scenario, model_id, f'{task}.csv')
+    file_path = os.path.join('../../data/image_to_text/hallucination', model_name, scenario, f'{task}.csv')
     data = pd.read_csv(file_path)
     img_ids = data['img_id'].tolist()
     questions = data['question'].tolist()
     answers = data['answer'].tolist()
 
     model = LLMChat()  # Initialize the model once per function call
-    output_dir = os.path.join('../../results/image_to_text/hallucination', scenario, task, model_name)
+    output_dir = os.path.join('../../results/image_to_text/hallucination', model_name, scenario, task)
     responses_path = os.path.join(output_dir, f'generation.csv')
     responses = pd.read_csv(responses_path)['response'].tolist()
 
@@ -78,11 +79,18 @@ def evaluate_accuracy(task, answer, generation):
     else:
         return 1 if 'yes' in generation.lower() else 0
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for evaluation')
-    parser.add_argument('--scenario', type=str, default="natural", help='Specify the scenario')
-    parser.add_argument('--task', type=str, default="identification", help='Specify the task to execute')
+    parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for generation')
+    parser.add_argument('--scenario', type=str, help='Scenario type')
+    parser.add_argument('--task', type=str, help='Task to be executed')
     args = parser.parse_args()
 
-    evaluate_responses(args.model_id, args.scenario, args.task)
+    text_to_image_scenarios = all_scenarios['image_to_text']
+
+    if args.scenario is None or args.task is None:
+        for scenario, tasks in text_to_image_scenarios.items():
+            for task in tasks:
+                evaluate_responses(args.model_id, scenario, task)
+    else:
+        evaluate_responses(args.model_id, args.scenario, args.task)

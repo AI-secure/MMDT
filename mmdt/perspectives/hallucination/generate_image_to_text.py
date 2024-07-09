@@ -7,6 +7,7 @@ from mmdt.models import Image2TextClient
 from .utils import COCOLoader, modify_image_with_boxes
 from mmdt.perspectives.hallucination.cooccurrence import generate_cooc_image_to_text
 import tempfile
+from scenario_list import all_scenarios
 
 def generate(model_id, scenario, task):
 
@@ -20,7 +21,7 @@ def generate(model_id, scenario, task):
 
     responses = []
     # Adjusted path for output directory
-    output_dir = os.path.join('../../results/image_to_text/hallucination', scenario, task, model_name)
+    output_dir = os.path.join('../../results/image_to_text/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
     response_file = os.path.join(output_dir, f'generation.csv')
 
@@ -42,9 +43,6 @@ def generate(model_id, scenario, task):
 
         additional_instruction = get_instruction_by_task(task)
         text += additional_instruction
-
-        if scenario == 'distraction':
-            image = modify_image_with_boxes(image, eval(bboxes[i]))  # Ensure bboxes are loaded
 
         with torch.no_grad():
             with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp:
@@ -77,8 +75,15 @@ def get_instruction_by_task(task):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for generation')
-    parser.add_argument('--scenario', type=str, default="natural", help='Scenario type')
-    parser.add_argument('--task', type=str, default="identification", help='Task to be executed')
+    parser.add_argument('--scenario', type=str, help='Scenario type')
+    parser.add_argument('--task', type=str, help='Task to be executed')
     args = parser.parse_args()
 
-    generate(args.model_id, args.scenario, args.task)
+    text_to_image_scenarios = all_scenarios['image_to_text']
+
+    if args.scenario is None or args.task is None:
+        for scenario, tasks in text_to_image_scenarios.items():
+            for task in tasks:
+                generate(args.model_id, scenario, task)
+    else:
+        generate(args.model_id, args.scenario, args.task)
