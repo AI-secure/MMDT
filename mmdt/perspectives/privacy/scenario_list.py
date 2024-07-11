@@ -3,7 +3,7 @@ scenario_list = {
         "pretrain": ["LAION_1K"],
     },
     "image_to_text": {
-        "pii": ["age",""],
+        "pii": ["Selfies"],
         "location": ["Pri-SV-with-text","Pri-SV-without-text","Pri-4Loc-SV-with-text","Pri-4Loc-SV-without-text"],
     },
 }

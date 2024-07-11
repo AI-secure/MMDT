@@ -1,6 +1,7 @@
 
 import argparse
 from location.generate_response_location_privacy import *
+from pii.generate_response_pii import generate_pii_response
 
 
 if __name__ == '__main__':
@@ -15,4 +16,5 @@ if __name__ == '__main__':
             generate_response_4img(args.model_id, args.task)
         elif args.task in ["Pri-SV-with-text","Pri-SV-without-text"]:
             generate_response_1img(args.model_id, args.task)
-    #else PII
+    elif (args.scenario == "pii"):
+        generate_pii_response(args.model_id)
