@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ### Download MMDT dataset
 
-We provide our dataset at [this URL](https://drive.google.com/file/d/10AGOjHD15TfZAxLbPmvUTdQLfQDax7z1/view?usp=sharing). Please unzip the file and put the folder at the repository root `./data`. The directory will look like:
+We provide our dataset at [this URL](https://drive.google.com/file/d/11syoVaMsh553V7x_5sytpPyRIOvKoYIw/view?usp=sharing). Please unzip the file and put the folder at the repository root `./data`. The directory will look like:
 
 ```
 .

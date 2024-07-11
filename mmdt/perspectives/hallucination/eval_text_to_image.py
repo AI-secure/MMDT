@@ -6,16 +6,32 @@ from mmdt.models import Image2TextClient
 from mmdt.detection import ImageDetector
 from .utils import determine_relative_position
 from PIL import Image
-from scenario_list import all_scenarios
+from mmdt.perspectives.hallucination.scenario_list import all_scenarios
+from mmdt.perspectives.hallucination.cooccurrence import evaluate_cooc_text_to_image
+from mmdt.perspectives.hallucination.ocr import evaluate_ocr_text_to_image
+from mmdt.perspectives.hallucination.misleading import evaluate_misleading_text_to_image
 
-def evaluate(model_id, scenario, task):
+def evaluate(kwargs):
+
+    model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
+
+    if scenario == "ocr":
+        evaluate_ocr_text_to_image(model_id, scenario, task)
+        return
+    elif scenario == "misleading":
+        evaluate_misleading_text_to_image(model_id, scenario, task)
+        return
+    elif scenario == "cooccurrence":
+        evaluate_cooc_text_to_image(model_id, scenario, task)
+        return
+
     """ Main function to perform image evaluations. """
     # Adjust the paths for the data and results directories
-    file_path = os.path.join('../../data/text_to_image/hallucination', scenario, f'{task}.csv')
+    file_path = os.path.join('data/text_to_image/hallucination', scenario, f'{task}.csv')
     file = pd.read_csv(file_path)
     img_ids = file['img_id'].tolist()
 
-    output_dir = os.path.join('../../results/text_to_image/hallucination', model_name, scenario, task)
+    output_dir = os.path.join('results/text_to_image/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize clients or detectors based on the task
@@ -78,6 +94,6 @@ if __name__ == "__main__":
     if args.scenario is None or args.task is None:
         for scenario, tasks in text_to_image_scenarios.items():
             for task in tasks:
-                evaluate_responses(args.model_id, scenario, task)
+                evaluate(args.model_id, scenario, task)
     else:
-        evaluate_responses(args.model_id, args.scenario, args.task)
+        evaluate(args.model_id, args.scenario, args.task)

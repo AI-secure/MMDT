@@ -6,6 +6,7 @@ from .image_to_text.instructblip import InstructBLIPClient
 from .image_to_text.llava import LlavaClient
 from .image_to_text.qwen import QwenClient
 
+
 # Text to image
 from .text_to_image.dalle import DalleClient
 from .text_to_image.deepfloyd_if import IFClient
@@ -36,6 +37,9 @@ class Image2TextClient:
 
     def generate(self, text, image_path, **kwargs):
         return self.client.generate(text, image_path, **kwargs)
+    
+    def generate_multiple_img(self, text, image_path_list, **kwargs):
+        return self.client.generate_multiple_img(text, image_path_list, **kwargs)
 
 
 class Text2ImageClient:

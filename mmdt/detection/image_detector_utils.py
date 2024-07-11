@@ -68,7 +68,7 @@ class ImageDetector:
         """
 
         for sample in tqdm(sample_dict):
-            print("sample", sample)
+            # print("sample", sample)
             if "box_threshold" not in sample_dict[sample]:
                 sample_result = self.single_detect(
                     sample_dict[sample]["img_path"], sample_dict[sample]["named_entity"]

@@ -4,19 +4,16 @@ import pandas as pd
 from tqdm import tqdm
 import argparse
 from mmdt.perspectives.hallucination.cooccurrence import generate_cooc_text_to_image
-from scenario_list import all_scenarios
+from mmdt.perspectives.hallucination.ocr import generate_ocr_text_to_image
+from mmdt.perspectives.hallucination.misleading import generate_misleading_text_to_image
+from mmdt.perspectives.hallucination.scenario_list import all_scenarios
 
-def generate(model_id, scenario, task):
-    # Adjusted path to read data from the correct directory
-    file_path = os.path.join('../../data/text_to_image/hallucination', scenario, f'{task}.csv')
-    data = pd.read_csv(file_path)
-    img_ids = data['img_id'].tolist()
-    prompts = data['prompt'].tolist()
-    
+def generate(kwargs):
+    model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
 
     # Define the output directory based on model name, scenario, and task
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('../../results/text_to_image/hallucination', model_name, scenario, task)
+    output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
 
     seed = 0
@@ -26,6 +23,21 @@ def generate(model_id, scenario, task):
     if scenario == "cooccurrence":
         generate_cooc_text_to_image(model_id, task, client, seed, output_dir)
         return
+    elif scenario == "ocr":
+        generate_ocr_text_to_image(model_id, task, client, seed, output_dir)
+        return
+    elif scenario == "misleading":
+        generate_misleading_text_to_image(model_id, task, client, seed, output_dir)
+        return
+
+    # Adjusted path to read data from the correct directory
+    file_path = os.path.join('data/text-to-image/hallucination', scenario, f'{task}.csv')
+    data = pd.read_csv(file_path)
+    img_ids = data['img_id'].tolist()
+    prompts = data['prompt'].tolist()
+    
+
+
 
 
     # Iterate over each prompt to generate images one by one

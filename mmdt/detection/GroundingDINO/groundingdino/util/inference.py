@@ -9,7 +9,7 @@ from torchvision.ops import box_convert
 import bisect
 import sys
 
-sys.path.append("./utils/GroundingDINO/")
+sys.path.append("mmdt/detection/GroundingDINO")
 import groundingdino.datasets.transforms as T
 from groundingdino.models import build_model
 from groundingdino.util.misc import clean_state_dict

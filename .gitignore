@@ -1,5 +1,6 @@
 data
 mmdt/perspectives/safety/results
+*summary.json
 
 *.DS_Store
 *./vscode

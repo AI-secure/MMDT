@@ -4,8 +4,11 @@ from tqdm import tqdm
 import argparse
 from PIL import Image
 from collections import Counter
-from utils import LLMChat
-from scenario_list import all_scenarios
+from mmdt.perspectives.hallucination.utils import LLMChat
+from mmdt.perspectives.hallucination.scenario_list import all_scenarios
+from mmdt.perspectives.hallucination.cooccurrence import evaluate_cooc_image_to_text
+from mmdt.perspectives.hallucination.ocr import evaluate_ocr_image_to_text
+from mmdt.perspectives.hallucination.misleading import evaluate_misleading_image_to_text
 
 def extract_counts_as_list(response, objects):
     import re
@@ -21,7 +24,20 @@ def extract_counts_as_list(response, objects):
 
     return result
 
-def evaluate(model_id, scenario, task):
+def evaluate(kwargs):
+    model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
+
+    if scenario == "ocr":
+        evaluate_ocr_image_to_text(model_id, scenario, task)
+        return
+    elif scenario == "misleading":
+        evaluate_misleading_image_to_text(model_id, scenario, task)
+        return
+    elif scenario == "cooccurrence":
+        evaluate_cooc_image_to_text(model_id, scenario, task)
+        return
+
+
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
     file_path = os.path.join('../../data/image_to_text/hallucination', model_name, scenario, f'{task}.csv')
     data = pd.read_csv(file_path)
@@ -86,11 +102,12 @@ if __name__ == "__main__":
     parser.add_argument('--task', type=str, help='Task to be executed')
     args = parser.parse_args()
 
-    text_to_image_scenarios = all_scenarios['image_to_text']
+    image_to_text_scenarios = all_scenarios['image_to_text']
 
     if args.scenario is None or args.task is None:
-        for scenario, tasks in text_to_image_scenarios.items():
+        for scenario, tasks in image_to_text_scenarios.items():
             for task in tasks:
-                evaluate_responses(args.model_id, scenario, task)
+                    evaluate(args.model_id, scenario, task)
     else:
-        evaluate_responses(args.model_id, args.scenario, args.task)
+        evaluate(args.model_id, args.scenario, args.task)
+

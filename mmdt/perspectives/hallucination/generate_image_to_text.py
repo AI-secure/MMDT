@@ -6,33 +6,46 @@ import torch
 from mmdt.models import Image2TextClient
 from .utils import COCOLoader, modify_image_with_boxes
 from mmdt.perspectives.hallucination.cooccurrence import generate_cooc_image_to_text
+from mmdt.perspectives.hallucination.ocr import generate_ocr_image_to_text
+from mmdt.perspectives.hallucination.misleading import generate_misleading_image_to_text
 import tempfile
-from scenario_list import all_scenarios
+from mmdt.perspectives.hallucination.scenario_list import all_scenarios
 
-def generate(model_id, scenario, task):
+def generate(kwargs):
 
+    model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    # Adjusted path to read data from the correct directory
-    file_path = os.path.join('../../data/image_to_text/hallucination', scenario, f'{task}.csv')
-    file = pd.read_csv(file_path)
-    img_ids = file['img_id'].tolist()
-    prompts = file['question'].tolist()
+    # Adjusted path for output directory
+    output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
+    os.makedirs(output_dir, exist_ok=True)
+    client = Image2TextClient(model_id=model_id)
     generation_configs = {'do_sample': False, 'max_new_tokens': 128}
 
-    responses = []
-    # Adjusted path for output directory
-    output_dir = os.path.join('../../results/image_to_text/hallucination', model_name, scenario, task)
-    os.makedirs(output_dir, exist_ok=True)
-    response_file = os.path.join(output_dir, f'generation.csv')
-
-    if os.path.exists(response_file):
-        print(f"Skipping generation as output file already exists: {response_file}")
-        return
-
-    client = Image2TextClient(model_id=model_id)
 
     if scenario == "cooccurrence":
         generate_cooc_image_to_text(model_id, task, client, generation_configs, output_dir)
+        return
+    elif scenario == "ocr":
+        generate_ocr_image_to_text(model_id, task, client, generation_configs, output_dir)
+        return
+    elif scenario == "misleading":
+        generate_misleading_image_to_text(model_id, task, client, generation_configs, output_dir)
+        return
+
+    response_file = os.path.join(output_dir, f'generation.csv')
+
+    
+    # Adjusted path to read data from the correct directory
+    file_path = os.path.join('data/image-to-text/hallucination', scenario, f'{task}.csv')
+    file = pd.read_csv(file_path)
+    img_ids = file['img_id'].tolist()
+    prompts = file['question'].tolist()
+
+    responses = []
+
+
+    if os.path.exists(response_file):
+        print(f"Skipping generation as output file already exists: {response_file}")
         return
 
 
