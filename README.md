@@ -62,7 +62,7 @@ bash script/hallucination.sh
 ```
 
 ### Notes
-+ Each of the eight areas has its own subdirectory containing the respective code and README.
++ Each of the six areas has its subdirectory containing the respective code and README.
 
 + Follow the specific `README`: Every subdirectory has its own README. Refer to these documents for information on how to run the scripts and interpret the results.
 
