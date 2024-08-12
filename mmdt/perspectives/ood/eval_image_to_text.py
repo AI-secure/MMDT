@@ -21,7 +21,7 @@ def extract_counts_as_list(response, objects):
     return result
 
 def get_prompt(task, question, answer, response):
-    if task in ['identification', 'attribute', 'action']:
+    if task in ['identification', 'attribute', 'spatial']:
         return f'''Given the question and its corresponding ground answer, determine whether the response from the model aligns with the ground answer. Respond with 'Yes' if the response matches one of the acceptable answers or 'No' if it is incorrect.
 
 #Question#: {question}
@@ -108,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_id', type=str, help='Model ID to evaluate')
     parser.add_argument('--scenario', type=str, help='Scenario to evaluate on')
     parser.add_argument('--task', type=str, help='Task to evaluate on')
+    parser.add_argument('--output_dir', type=str, default='./results', help='Output directory')
     args = parser.parse_args()
     
-    evaluate(args.model_id, args.scenario, args.task)
+    evaluate(args)

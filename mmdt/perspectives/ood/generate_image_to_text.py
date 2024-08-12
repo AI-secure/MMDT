@@ -84,6 +84,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for image generation')
     parser.add_argument('--scenario', type=str, default="Van_Gogh", help='Specify the scenario')
     parser.add_argument('--task', type=str, default="identification", help='Specify the task to execute')
+    parser.add_argument('--output_dir', type=str, default="./results", help='Output directory')
     args = parser.parse_args()
     generate(args)
 

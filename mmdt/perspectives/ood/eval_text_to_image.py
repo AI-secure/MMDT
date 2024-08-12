@@ -134,6 +134,7 @@ if __name__ == "__main__":
     parser.add_argument("--task", type=str, default="helpfulness")
     parser.add_argument("--scenario", type=str, default="Shake")
     parser.add_argument("--model_id", type=str, default="dall-e-3")
+    parser.add_argument("--output_dir", type=str, default="./results")
     args = parser.parse_args()
 
     evaluate(args)
