@@ -82,7 +82,7 @@ def evaluate(args):
             summary = json.load(f)
     else:
         summary = {}
-    correct = df_results['accuracy'].sum()
+    correct = sum(df_results['accuracy'] == 1)
     total = len(results)
     if model_id not in summary:
         summary[model_id] = {}
@@ -99,7 +99,7 @@ def evaluate_accuracy(task, answer, generation):
         objects = list(answer_dict.keys())
         calculated_nums = extract_counts_as_list(generation, objects)
         correct_matches = sum(g == answer_dict[obj] for obj, g in zip(objects, calculated_nums))
-        return correct_matches / len(objects) if len(objects) > 0 else 0
+        return correct_matches == len(objects) if len(objects) > 0 else 0
     else:
         return 1 if 'yes' in generation.lower() else 0
 
