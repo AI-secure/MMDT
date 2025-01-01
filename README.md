@@ -33,20 +33,17 @@ conda activate mmdt
 pip install -r requirements.txt
 ```
 
-### Download MMDT dataset
+### Load MMDT dataset
 
-We provide our dataset at [this URL](https://drive.google.com/file/d/11syoVaMsh553V7x_5sytpPyRIOvKoYIw/view?usp=sharing). Please unzip the file and put the folder at the repository root `./data`. The directory will look like:
+```python
+from datasets import load_dataset
 
+ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")  # Load Hallucination subset of Text-to-Image dataset
+
+ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "fairness")  # Load Fairness subset of Image-to-Text dataset
 ```
-.
-├── data
-│   ├── image-to-text
-│   └── text-to-image
-├── mmdt
-├── scripts
-├── README.md
-└── requirements.txt
-```
+
+Please refer to our HF datasets for more details ([Text-to-Image](https://huggingface.co/datasets/AI-Secure/MMDecodingTrust-T2I), [Image-to-Text](https://huggingface.co/datasets/AI-Secure/MMDecodingTrust-I2T)).
 
 ### Evaluate all perspectives
 
