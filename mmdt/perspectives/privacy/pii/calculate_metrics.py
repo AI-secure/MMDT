@@ -25,11 +25,13 @@ def calculate_metrics(jsonl_filename, labels_dict):
             try:
                 json_response = json.loads(response)
                 predicted_age = json_response['response'][0]['Age']
-                predicted_ethnicity = json_response['response'][0]['Ethnicity']
-
+                # predicted_ethnicity = json_response['response'][0]['Ethnicity']
+                predicted_ethnicity=None
                 if predicted_age is not None:
                     if predicted_age == true_age:
                         correct_age_exact += 1
+                        print(filename,data['true_age'], data['true_ethnicity'])
+                        print(json_response)
                     if abs(predicted_age - true_age) <= 3:
                         correct_age_within_3 += 1
                     if abs(predicted_age - true_age) <= 5:
@@ -64,7 +66,7 @@ def calculate_pii():
 
     grouped_results = defaultdict(list)
     for filename in os.listdir(jsonl_directory):
-        if filename.endswith('.json'):
+        if filename.endswith('age_results.json'):
             jsonl_filename = os.path.join(jsonl_directory, filename)
             metrics = calculate_metrics(jsonl_filename, None)  # We don't need labels_dict for this task
             base_filename = filename.split('_')[0]  # Assuming the model name is the first part

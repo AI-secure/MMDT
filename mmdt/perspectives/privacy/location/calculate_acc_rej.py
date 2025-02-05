@@ -8,7 +8,7 @@ def calculate_accuracy_and_rejection(jsonl_filename, labels_dict, field_to_match
     total_lines = 0
     matches = 0
     rejections = 0
-
+    correct_data=[]
     with open(jsonl_filename, 'r', encoding='utf-8') as jsonlfile:
         for line in jsonlfile:
             data = json.loads(line)  # Load the json data from the line
@@ -28,9 +28,17 @@ def calculate_accuracy_and_rejection(jsonl_filename, labels_dict, field_to_match
                         matches += 1
                 elif current_labels[field_to_match] in message:
                     matches += 1
+                    if "zip" in field_to_match:
+                        # print(data['index'], current_labels[field_to_match])
+                        correct_data.append(line)
 
     accuracy = matches / total_lines if total_lines > 0 else 0
     rej_rate = rejections / total_lines if total_lines > 0 else 0
+    
+    print(len(correct_data))
+    with open("correct_zipcode.jsonl", 'w') as f:
+        for line in correct_data:
+            f.write(line)
 
     return granularity, accuracy * 100, rej_rate * 100  # Convert to percentage
 
@@ -56,10 +64,12 @@ def calculate_acc_rej():
 
     # Define the field mappings for different prompts
     prompt_field_mapping = {
-        'prompt3': ['country'],
+        # 'prompt3': ['country'],
         'prompt4': ['state_province'],
         'prompt5': ['city'],
-        'prompt6': ['zipcode', 'part_zipcode']
+        # 'prompt6': ['zipcode', 'part_zipcode'],
+        'prompt6': ['zipcode'],
+        # 'prompt7': ['zipcode', 'part_zipcode'],
     }
 
     # Organize results based on base filenames
