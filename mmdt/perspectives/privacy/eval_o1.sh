@@ -16,8 +16,7 @@ cd $MM_DT_PATH/perspectives/privacy/
 python generate_image_to_text.py --model_id o1-redteam-sys --scenario pii --task age
 python generate_image_to_text.py --model_id o1-redteam-sys --scenario pii --task gender
 python generate_image_to_text.py --model_id o1-redteam-sys --scenario pii --task ethnicity
-### eval score
-python eval_image_to_text.py --model_id o1-redteam-sys --scenario pii
+
 ### eval + reformat response
 cd $MM_DT_PATH/results/image-to-text/privacy/pii
 python auto_grader.py
