@@ -4,11 +4,34 @@ import re
 
 import shutil
 
-def convert_line(jsonl_line, index=0, save_file=False):
+import os, sys
+path_to_add = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))
+sys.path.append(path_to_add)
+print("sys.path includes:")
+for path in sys.path:
+    print(path)
+
+from perspectives.privacy.vispr.generate_response_vispr import naive_prompt,naive_enhance_prompt, naive_prompt_w_info_type, out_of_context_prompt, generated_prompt, story_prompt
+
+
+def convert_line(jsonl_line, index=0, mode= "naive_enhance", save_file=False):
     data = json.loads(jsonl_line)
     fname= os.path.join( "./vispr", data["foldername"],  data["filename"],)
-    case_id=index
-    prompt =data["prompt"]
+    # Prompt selection based on mode
+    prompts = {
+        "naive": naive_prompt,
+        "naive_enhance": naive_enhance_prompt,
+        "naive_w_info_type": naive_prompt_w_info_type,
+        "out_of_context": out_of_context_prompt,
+        "generated": generated_prompt,
+        "story": story_prompt,
+    }
+
+    prompt = prompts.get(mode)
+    if not prompt:
+        raise ValueError(f"Unknown mode: {mode}")
+    
+
     response=data["response"]
     
             
@@ -62,7 +85,7 @@ def convert_line(jsonl_line, index=0, save_file=False):
 
     return conversation, is_reject, is_correct
 
-def process_jsonl_file(input_file, output_file):
+def process_jsonl_file(input_file, output_file, mode):
     # List to store all conversations
     all_conversations = []
     total_lines = 0
@@ -77,7 +100,7 @@ def process_jsonl_file(input_file, output_file):
             if line.strip():  # Skip empty lines
                 try:
                     total_lines+=1
-                    conversation , is_reject, is_correct = convert_line(line, index,save_file=False)
+                    conversation , is_reject, is_correct = convert_line(line, index, mode, save_file=False)
             
                     response=conversation["conversation"][0]["model_completion"]
                     
@@ -113,18 +136,10 @@ def process_jsonl_file(input_file, output_file):
     print(f"False rate: {false_rate:.2f}%")
 
 # Usage
-# input_file = "o1-redteam-sys_vispr_naive_results.json"
-# output_file = "vispr_naive.json"
 
-input_file = "o1-redteam-sys_vispr_naive_enhance_results.json"
-output_file = "vispr_naive_enhance.json"
+mode = "naive_enhance"  # Change this to any available mode: naive, naive_enhance, naive_w_info_type, out_of_context, generated, story
 
-# input_file = "o1-redteam-sys_vispr_story_results.json"
-# output_file = "vispr_story.json"
+input_file = f"o1-redteam-sys_vispr_{mode}_results.json"
+output_file = f"vispr_{mode}.json"
 
-# input_file = "o1-redteam-sys_vispr_naive_w_info_type_results.json"
-# output_file = "vispr_naive_w_info_type.json"
-
-# input_file = "o1-redteam-sys_vispr_generated_results.json"
-# output_file = "vispr_generated.json"
-process_jsonl_file(input_file, output_file)
+process_jsonl_file(input_file, output_file, mode=mode)
