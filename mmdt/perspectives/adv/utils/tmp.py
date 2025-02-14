@@ -1,27 +1,10 @@
+from pycocotools.coco import COCO
+import os
+from PIL import Image
 import torch.nn as nn
 import transformers
 import torch
-from pycocotools.coco import COCO
-import os
-from PIL import Image, ImageDraw
-import random
 
-def determine_relative_position(bbox1, bbox2):
-    """ Determine the relative position between two bounding boxes. """
-    x1 = bbox1[0] + bbox1[2] / 2
-    y1 = bbox1[1] + bbox1[3] / 2
-    x2 = bbox2[0] + bbox2[2] / 2
-    y2 = bbox2[1] + bbox2[3] / 2
-    
-    if x1 < x2 and abs(x1 - x2) > abs(y1 - y2):
-        return 'left'
-    elif x1 > x2 and abs(x1 - x2) > abs(y1 - y2):
-        return 'right'
-    elif y1 < y2:
-        return 'above'
-    else:
-        return 'below'
-    
 class COCOLoader:
     def __init__(self, dataDir='data', dataType='train2017'):
         """
@@ -66,27 +49,6 @@ class COCOLoader:
         """
         annIds = self.captions.getAnnIds(imgIds=image_id)
         return self.captions.loadAnns(annIds)
-    
-    
-def modify_image_with_boxes(image, bboxes):
-    
-    # Prepare to draw on the image
-    draw = ImageDraw.Draw(image)
-
-    # Draw each bounding box with a dynamically scaled outline width
-    for bbox in bboxes:
-        # Calculate the outline width as a fraction of the average size of the bounding box
-        outline_width = min(max(2, int((bbox[2] * bbox[3]) * 0.0025)), 5)  # 2.5% of the average dimension
-        
-        # Draw a rectangle on the image using the bbox coordinates
-        draw.rectangle(
-            [bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]],
-            outline="red",
-            width=outline_width
-        )
-
-    # Return the modified image
-    return image
 
 class LLMChat(nn.Module):
     def __init__(self, model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'):
@@ -123,3 +85,4 @@ class LLMChat(nn.Module):
         )
         
         return outputs[0]["generated_text"][len(prompt):]
+
