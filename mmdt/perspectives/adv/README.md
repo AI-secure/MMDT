@@ -27,7 +27,6 @@ wget -q https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-
 ```
 
 ### Generation
-Make sure you are at the adv sub directory.
 
 T2I Generation:
 ```
