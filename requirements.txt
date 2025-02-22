@@ -10,4 +10,9 @@ scikit-learn
 shortuuid
 opencv-python
 spacy
+supervision
+addict
+yapf
+pycocotools
+timm
 -e git+https://github.com/openai/CLIP.git@main#egg=clip

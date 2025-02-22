@@ -23,6 +23,7 @@ def get_args():
     parser.add_argument('--scenario', type=str, default="", help='Scenario type')
     parser.add_argument('--task', type=str, default="", help='Task to be executed')
     parser.add_argument('--output_dir', type=str, default="./results", help='Output directory')
+    parser.add_argument('--dry_run', action='store_true', help='Dry run')
     args = parser.parse_args()
     return args
 

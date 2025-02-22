@@ -1,40 +1,87 @@
-import os
-import pandas as pd
-from tqdm import tqdm
-import argparse
+import numpy as np
 import torch
+import os
 import sys
-sys.path.append("../../../")
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append("./")
+
+import time
+import random
+from glob import glob
+from PIL import Image
+
+from mmdt.detection.image_detector_utils import ImageDetector, draw_bbox
 from mmdt.models import Text2ImageClient
 
-def generate(model_id, task):
+from tqdm import tqdm
+import json
+import pandas as pd
 
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    # Adjusted path to read data from the correct directory
-    file_path = os.path.join('../../../data/text-to-image/adv', f'{task}.csv')
-    data = pd.read_csv(file_path)
+import argparse
 
-    # Adjusted path for output directory
-    output_dir = os.path.join('../../../results/text-to-image/adv', task, model_name)
-    os.makedirs(output_dir, exist_ok=True)
+from datasets import load_dataset
 
-    seed = 20
+seed = 20
 
-    client = Text2ImageClient(model_id=model_id)
 
-    for i, row in tqdm(data.iterrows()):
-        img_id = row['id']
-        prompt = row['adv_prompt']
-        image_path = os.path.join(output_dir, f'{img_id}.png')
-        if not os.path.exists(image_path):
-            image = client.generate(prompt, seed=seed, save_path=image_path)
+def generate_image(client, prompt, seed_val, save_path, dry_run=False):
+    if not os.path.exists(save_path):
+        if dry_run:
+            print(f"Dry run enabled. Generating an empty image at {save_path}.")
+            # Create an empty white image of size 512x512
+            image = Image.new("RGB", (512, 512), "white")
         else:
-            print(f"Image {img_id} already exists. Skipping generation.")
+            image = client.generate(text=prompt, seed=seed_val, save_path=save_path)
+        image.save(save_path)
+    else:
+        print(f"Image already exists. Skipping generation.")
+        image = Image.open(save_path)
+    return image
 
-if __name__ == '__main__':
+
+def generate_single_task(args):
+    ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "adv", split=args.task)
+    iter_ds = ds.to_iterable_dataset()
+
+    result_root_dir = os.path.join("./results/text_to_image", args.model_id, args.task)
+    os.makedirs(result_root_dir, exist_ok=True)
+
+    image_dir = os.path.join(result_root_dir, "output_images")
+    os.makedirs(image_dir, exist_ok=True)
+
+    client = Text2ImageClient(model_id=args.model_id)
+
+    for row in tqdm(iter_ds, total=len(ds)):
+        prompt = row['adv_prompt']
+        index = row['id']
+        for i in range(args.image_number):
+            image_path = os.path.join(image_dir, f"{index}_{i}.png")
+            generate_image(client, prompt, seed + i, image_path, dry_run=args.dry_run)
+            print(f"Image {image_path} generated")
+
+    print(f"Images generated at {image_dir}")
+
+
+def generate(args):
+    # Allow multiple tasks if needed (comma-separated)
+    tasks = args.task if args.task != '' else 'object'
+    tasks = [t.strip() for t in tasks.split(',')]
+    args.image_number = 3  # set default value
+    for task in tasks:
+        args.task = task  # Update the task for each iteration
+        generate_single_task(args)
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for image generation')
-    parser.add_argument('--task', type=str, default="object", help='Specify the task to execute')
-    args = parser.parse_args()
+    parser.add_argument('--model_id', type=str, help='Model ID to use for generation',
+                        default="stabilityai/stable-diffusion-2")
+    parser.add_argument('--task', type=str, help='Sub task to be executed', default="object")
+    parser.add_argument('--image_number', type=int,
+                        help='Number of images to be generated per sample', default=1)
+    parser.add_argument('--dry_run', action='store_true',
+                        help='Enable dry run mode to generate empty image')
 
-    generate(args.model_id, args.task)
+    args = parser.parse_args()
+    generate(args)
