@@ -132,6 +132,7 @@ def generate_misleading_text_to_image(model_id, task, client, seed, output_dir):
                 image_path = os.path.join(
                     image_dir, f"{model_id.split('/')[-1]}_{i}_{j}.jpg"
                 )
+
                 results.append({"id":i,"object":objects[i],"attribute":attribute[i],"number":number[i],"relation_object":relation_objects[i],"spatial_relation":spatial_relation[i],"prompt":prompts[i],"image_path":image_path})
             except Exception as e:
                 with open(f"{output_dir}/error_log.txt", "a") as error_file:

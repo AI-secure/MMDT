@@ -52,9 +52,11 @@ def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
                 prompt = item["prompt"]
 
                 img_output_dir = response_save_root + f"/{type_folder}_{category}_{i_idx}.png"
-                response_image = client.generate(prompt, seed, img_output_dir)
-
-                response_image.save(img_output_dir)
+                response_image = client.generate(
+                    prompt, 
+                    seed, 
+                    save_path=img_output_dir
+                )
 
                 new_item["response_image"] = img_output_dir
 
@@ -316,15 +318,6 @@ def evaluate_cooc_text_to_image(model_id, scenario, task):
     with open(generation_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-
-    # processor_llava16 = LlavaNextProcessor.from_pretrained(
-    #     "llava-hf/llava-v1.6-mistral-7b-hf"
-    # )
-    # client = LlavaNextForConditionalGeneration.from_pretrained(
-    #     "llava-hf/llava-v1.6-mistral-7b-hf", torch_dtype=torch.float16
-    # )
-    # client.to("cuda")
-
     client = LlavaClient("llava-hf/llava-v1.6-mistral-7b-hf")
 
     generation_configs = {'do_sample': False, 'max_new_tokens': 128}
@@ -537,14 +530,11 @@ def evaluate_cooc_text_to_image(model_id, scenario, task):
 
                     juedge_response = client.generate(prompt, response_image, **generation_configs)
 
-                    if juedge_response == "Yes" or juedge_response == "YES":
+                    if  "Yes" in juedge_response or "YES" in juedge_response:
                         acc += 1
                         acc_type += 1
                         acc_all += 1
                         attribute_acc += 1
-
-                    # print("low cooc juedge_response", juedge_response)
-                    # input()
 
                 elif folder == "historical_bias" and category == "attribute":
 

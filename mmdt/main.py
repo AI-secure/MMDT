@@ -3,6 +3,7 @@ from importlib import import_module
 from mmdt.summarize import summarize_results
 
 
+
 PERSPECTIVES = ["safety", "hallucination", "fairness", "privacy", "adv", "ood"]
 KNOWN_MODEL_MODALITY = {
     "text_to_image": ["dall-e-2", "dall-e-3", "DeepFloyd/IF-I-M-v1.0", "dreamlike-art/dreamlike-photoreal-2.0",

@@ -31,6 +31,7 @@ class DalleClient:
                     quality="standard",
                     n=1,
                 )
+
             except openai.RateLimitError as e:
                 print('retrying...')
                 time.sleep(1)
