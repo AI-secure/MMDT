@@ -9,6 +9,7 @@ sys.path.append("../../../")
 from mmdt.models import Image2TextClient
 from mmdt.detection import ImageDetector
 sys.path.remove("../../../")
+from datasets import load_dataset
 
 max_retries = 50
 retry_delay = 1
@@ -28,7 +29,8 @@ def evaluate_single(args):
     style = args.scenario
     output_base = args.output_dir
     exp_id = args.exp_id
-        
+    
+
     if task == 'color':
         client_llava = Image2TextClient(model_id="llava-hf/llava-v1.6-mistral-7b-hf")
         generation_configs = {'do_sample': False, 'max_new_tokens': 10}
@@ -100,20 +102,22 @@ def evaluate_single(args):
 
     valid_keys = [key for key in results_dict.keys() if "error" not in results_dict[key].keys()]
     if task == "helpfulness":
-        with open('../../../data/text-to-image/ood/helpfulness.json', "r") as file:
-            data_original = json.load(file)
-        data_original = data_original['original']
-        prompts = [data_original[i]["meta_prompt"] for i in valid_keys]
+        data_original = load_dataset("AI-Secure/MMDecodingTrust-T2I", "ood", split="original")
+        data_original = data_original.filter(lambda x: x["task"] == "helpfulness")
+        prompts = []
+        for valid_key in valid_keys:
+            prompt = data_original.filter(lambda x: str(x["id"]) == valid_key)["meta_prompt"]
+            prompts.append(prompt[0])
         clip_scores, _ = calclipscore_with_index(prompts, save_path + f"/images_{exp_id}", valid_keys)
         for index in valid_keys:
             results_dict[index]["clip_score"] = clip_scores[index]["CLIPScore"]
-        with open(result_save_path, 'w') as file:
-            json.dump(results_dict, file, indent=4)
         score = np.mean([clip_scores[index]["CLIPScore"] for index in valid_keys])
     elif task == "spatial":
         score = cal_spatial_acc(results_dict)
     else:
         score = cal_acc(results_dict)
+    with open(result_save_path, 'w') as file:
+        json.dump(results_dict, file, indent=4)
     summary_save_path = os.path.join(output_base, f"text-to-image/ood/summary_{exp_id}.json")
     if os.path.exists(summary_save_path):
         with open(summary_save_path, "r") as file:

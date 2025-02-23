@@ -7,6 +7,7 @@ import time
 sys.path.append("../../../")
 from mmdt.models import Image2TextClient, Text2ImageClient
 sys.path.remove("../../../")
+from datasets import load_dataset
 
 max_retries = 50
 retry_delay = 1
@@ -26,8 +27,13 @@ def generate_single(args):
     style = args.scenario
     exp_id = args.exp_id
     output_base = args.output_dir
-    with open(f'../../../data/text-to-image/ood/{task}.json', 'r') as file:
-        data_all = json.load(file)
+
+    # Load dataset from Hugging Face
+    ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "ood", split=style)
+    iter_ds = ds.to_iterable_dataset()
+    # Filter for current task
+    data = [row for row in iter_ds if row['task'] == task]
+    
     model_name = model_id.split("/")[-1]
     save_path = os.path.join(output_base, f"text-to-image/ood/{style}/{task}/{model_name}")
 
@@ -38,39 +44,48 @@ def generate_single(args):
     else:
         results_dict = {}
     result_save_path = save_path + f'/results_dict_{exp_id}.json'
-    data = data_all[style]
-    left_data = [index for index in data.keys() if index not in results_dict.keys()]
+    
+    # Find data that hasn't been processed yet
+    processed_ids = set(results_dict.keys())
+    left_data = [row for row in data if str(row['id']) not in processed_ids]
 
     if len(left_data) != 0:
         client = Text2ImageClient(model_id=model_id)
     else:
         print("All data has been processed. Exiting...")
         client = None
+        
     refusal = False
-    for left_idx, index in enumerate(left_data):
+    for left_idx, row in enumerate(left_data):
+        index = str(row['id'])
         print(f"Processing {left_idx}/{len(left_data)} on model {model_name}")
-        results_dict[index] = data[index]
+        results_dict[index] = {
+            'meta_prompt': row['meta_prompt'] if "meta_prompt" in row else None,
+            'objects': row['objects'] if "objects" in row else None,
+            'task': row['task'],
+            'vanilla_prompt': row['vanilla_prompt'] if "vanilla_prompt" in row else None
+        }
+        
         image_path = save_path + f"/images_{exp_id}/{index}.png"
-        drawing_prompt = data[index]['meta_prompt']
+        drawing_prompt = row['meta_prompt']
         for attempt in range(max_retries):
             try:
-                image = client.generate(drawing_prompt, seed=seed + exp_id, save_path = image_path)
+                image = client.generate(drawing_prompt, seed=seed + exp_id, save_path=image_path)
                 break
             except Exception as e:
                 print(f"Attempt {attempt + 1} failed: {e}")
                 if "content_policy_violation" in str(e) and attempt >= 10:
-                    results_dict[index] = data[index]
                     results_dict[index]["error"] = str(e)
                     print(f"Content policy violation: {e}")
                     refusal = True
                     break
                 if attempt == max_retries - 1:
-                    # raise  # Re-raise the last exception after the last retry
-                    raise # Re-raise the last exception after the last retry
+                    raise  # Re-raise the last exception after the last retry
                 time.sleep(retry_delay)  # Wait before the next retry
+                
         if model_id != "dall-e-2" and model_id != "dall-e-3":
             image.save(image_path)
-        results_dict[index] = data[index]
+            
         if refusal:
             refusal = False
             continue

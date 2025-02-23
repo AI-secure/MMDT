@@ -9,20 +9,23 @@ sys.path.append("../../../")
 from mmdt.models import Image2TextClient
 sys.path.remove("../../../")
 import torch
+from datasets import load_dataset
 
 
 max_retries = 100
 retry_delay = 1
 
-st_img_path = "../../../data/image-to-text/ood/images"
 def generate(args):
     model_id = args.model_id
     corruption = args.scenario
     task = args.task
     output_base = args.output_dir
-    file_path = os.path.join("../../../data/image-to-text/ood", f"{task}.json")
-    with open(file_path, "r") as f:
-        data = json.load(f)
+
+    # Load dataset from Hugging Face
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "ood", split=corruption)
+    iter_ds = ds.to_iterable_dataset()
+    # Filter for current task
+    task_data = [row for row in iter_ds if row['task'] == task]
 
     print(f"Running model {model_id} on task {task} with corruption {corruption}")
     generation_configs = {'do_sample': False, 'temperature': 0, 'max_new_tokens': 128}
@@ -38,12 +41,15 @@ def generate(args):
         num_current_responses = 0
     
     client = Image2TextClient(model_id=model_id)
-    all_index = list(data[corruption].keys())
 
-    for i in tqdm(range(num_current_responses, len(data[corruption]))):
-        img_id = data[corruption][all_index[i]]["img_id"]
-        text = data[corruption][all_index[i]]["question"]
-        image_path = os.path.join(st_img_path, f"{corruption}/{img_id}.jpg")
+    for i in tqdm(range(num_current_responses, len(task_data))):
+        row = task_data[i]
+        img_id = row["img_id"]
+        text = row["question"]
+        image = row["image"]
+        # Save image temporarily for processing
+        temp_image_path = os.path.join(output_dir, f"temp_{img_id}.jpg")
+        image.save(temp_image_path)
 
         if task == 'identification':
             additional_instruction = ' Please provide the object in a few words.'
@@ -59,14 +65,17 @@ def generate(args):
         with torch.no_grad():
             for attempt in range(max_retries):
                 try:
-                    response = client.generate(text + additional_instruction, image_path, **generation_configs)
+                    response = client.generate(text + additional_instruction, temp_image_path, **generation_configs)
                     break
                 except Exception as e:
                     print(f"Attempt {attempt + 1} failed: {e}")
                     if attempt == max_retries - 1:
                         raise  # Re-raise the last exception after the last retry
                     time.sleep(retry_delay)  # Wait before the next retry
-                
+
+        # Clean up temporary image
+        if os.path.exists(temp_image_path):
+            os.remove(temp_image_path)
 
         responses.append({'img_id': img_id, 'response': response})
         print(response)

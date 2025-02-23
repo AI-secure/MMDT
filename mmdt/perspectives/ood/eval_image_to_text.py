@@ -5,6 +5,7 @@ from tqdm import tqdm
 import argparse
 import json
 from utils import LLMChat
+from datasets import load_dataset
 
 # Constants and Initialization
 def extract_counts_as_list(response, objects):
@@ -35,7 +36,6 @@ def get_prompt(task, question, answer, response):
 #Answer#: {response}'''
 
 def evaluate(args):
-    data_root = "../../../data/image-to-text/ood"
     model_id = args.model_id
     scenario = args.scenario
     task = args.task
@@ -43,11 +43,11 @@ def evaluate(args):
 
     output_root = os.path.join(output_base, "image-to-text/ood")
     
-    file_path = os.path.join(data_root, f'{task}.json')
-    model_name = model_id.split("/")[-1]
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+    # Load dataset from Hugging Face
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "ood", split=scenario)
+    iter_ds = ds.to_iterable_dataset()
     
+    model_name = model_id.split("/")[-1]
     model = LLMChat()  # Initialize the model once per function call
 
     results = []
@@ -56,12 +56,14 @@ def evaluate(args):
     responses = pd.read_csv(responses_path)['response'].tolist()
     os.makedirs(output_dir, exist_ok=True)
 
-    keys = list(data[scenario].keys())
-    for i in tqdm(range(len(data[scenario])), desc=f"Processing {model_id}"):
-        # img_id = img_ids[i]
-        question = data[scenario][keys[i]]["question"]
-        answer = data[scenario][keys[i]]["answer"]
-        img_id = data[scenario][keys[i]]["img_id"]
+    # Filter dataset for current task
+    task_data = [row for row in iter_ds if row['task'] == task]
+    
+    for i in tqdm(range(len(task_data)), desc=f"Processing {model_id}"):
+        row = task_data[i]
+        question = row["question"]
+        answer = row["answer"]
+        img_id = row["img_id"]
         response = responses[i]
         prompt = get_prompt(task, question, answer, response)
         generation = model(prompt)
