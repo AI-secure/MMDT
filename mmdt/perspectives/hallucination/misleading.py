@@ -6,20 +6,26 @@ from transformers import (
     LlavaNextProcessor,
     LlavaNextForConditionalGeneration,
 )
-
+from datasets import load_dataset
 
 def generate_misleading_image_to_text(model_id, task, client, generation_configs, output_dir):
-    # Adjusted path to read data from the correct directory
-    base_dir = f'data/image-to-text/hallucination/misleading/{task}/'
+    
+    temp_dir = "./temp/hallucination/"
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+        
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
+    misleading_folder = ds["misleading"]
     misleading, question_array,image_paths,results = [], [],[],[]
-    input_file = base_dir + "dataset.json"
-    with open(input_file, "r", encoding="utf-8") as json_file:
-        data = json.load(json_file)
-    for entry in data:
-        misleading.append(entry.get("keyword", ""))
-        question_array.append(entry.get("question", ""))
-        image_id = entry.get("id", "")
-        image_paths.append(base_dir + f"images/{image_id}.png")
+    for entry in misleading_folder:
+        if entry["task"] == task:
+            misleading.append(entry["keyword"])
+            question_array.append(entry["question"])
+            image_id = entry["id"]
+            img = entry["image"]
+            image_path = os.path.join(temp_dir, f"misleading_{task}_{image_id}.png")
+            img.save(image_path)
+            image_paths.append(image_path)
         
     total_number = len(question_array)
     for i in range(0, total_number):
@@ -76,34 +82,38 @@ def evaluate_misleading_image_to_text(model_id, scenario, task):
         else:
             result = True
         if result == True:
-            results.append({"id":data["id"],"accuracy":1})
+            results.append({"id":data["id"],"hallucinated":1})
             hallucinated_number += 1
         else :
-            results.append({"id":data["id"],"accuracy":0})
-    print(f"hallucination rate: {hallucinated_number/len(data_list)}")
+            results.append({"id":data["id"],"hallucinated":0})
+    accuracy = 1 - hallucinated_number/len(data_list)
+    print(f"Accuracy: {accuracy}")
+    result_dict = {}
+    result_dict["accuracy"] =  accuracy
+    result_dict["detail"] = results
     with open(f"{output_dir}/result.json", "w") as f:
-        json.dump(results, f, indent=4)
+        json.dump(result_dict, f, indent=4)
         
 
 def generate_misleading_text_to_image(model_id, task, client, seed, output_dir):
     # Adjusted path to read data from the correct directory
-    base_dir = f'data/text-to-image/hallucination/misleading/'
+    ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
+    misleading_folder = ds["misleading"]
     objects = []
     attribute = []
     number = []
     relation_objects = []
     spatial_relation = []
     prompts = []
-    input_file = base_dir + "spatial.json"
-    with open(input_file, "r", encoding="utf-8") as json_file:
-        data = json.load(json_file)
-    for entry in data:
-        objects.append(entry.get("object", ""))
-        attribute.append(entry.get("attribute", ""))
-        number.append(entry.get("number", ""))
-        relation_objects.append(entry.get("relation_object", ""))
-        spatial_relation.append(entry.get("spatial_relation", ""))
-        prompts.append(entry.get("prompt", ""))
+    for entry in misleading_folder:
+        if entry["task"] == task:
+            objects.append(entry.get("object", ""))
+            attribute.append(entry.get("attribute", ""))
+            number.append(entry.get("number", ""))
+            relation_objects.append(entry.get("relation_object", ""))
+            spatial_relation.append(entry.get("spatial_relation", ""))
+            prompts.append(entry.get("prompt", ""))
+            
     total_number = max(len(objects), len(attribute), len(number), len(relation_objects), len(spatial_relation), len(prompts))
     image_dir = output_dir+"/images"
     os.makedirs(image_dir, exist_ok=True)
@@ -241,6 +251,11 @@ def evaluate_misleading_text_to_image(model_id, scenario, task):
                         results.append({"id":i,"detection_result": res["entity_info"],"accuracy":0})
                     else:
                         results.append({"id":i,"detection_result": res["entity_info"],"accuracy":1})
-    print(f"hallucination rate: {hallucinated_number/len(results)}")
+        
+    accuracy = 1 - hallucinated_number/len(results)
+    print(f"Accuracy: {accuracy}")
+    result_dict = {}
+    result_dict["accuracy"] =  accuracy
+    result_dict["detail"] = results
     with open(f"{output_dir}/result.json", "w") as f:
-        json.dump(results, f, indent=4)
+        json.dump(result_dict, f, indent=4)

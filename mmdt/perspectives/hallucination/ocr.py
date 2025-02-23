@@ -2,19 +2,25 @@ import os
 import json
 from PIL import Image
 import easyocr
-
+from datasets import load_dataset
 def generate_ocr_image_to_text(model_id, task, client, generation_configs, output_dir):
-    # Adjusted path to read data from the correct directory
-    base_dir = f'../../data/image_to_text/hallucination/ocr/{task}/'
+    
+    temp_dir = "./temp/hallucination/"
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+   
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
+    misleading_folder = ds["ocr"] 
     misleading, question_array,image_paths,results = [], [],[],[]
-    input_file = base_dir + "dataset.json"
-    with open(input_file, "r", encoding="utf-8") as json_file:
-        data = json.load(json_file)
-    for entry in data:
-        misleading.append(entry.get("keyword", ""))
-        question_array.append(entry.get("question", ""))
-        image_id = entry.get("id", "")
-        image_paths.append(base_dir + f"images/{image_id}.png")
+    for entry in misleading_folder:
+        if entry["task"] == task:
+            misleading.append(entry["keyword"])
+            question_array.append(entry["question"])
+            image_id = entry["id"]
+            img = entry["image"]
+            image_path = os.path.join(temp_dir, f"ocr_{task}_{image_id}.png")
+            img.save(image_path)
+            image_paths.append(image_path)
         
     total_number = len(question_array)
     for i in range(0, total_number):
@@ -48,7 +54,7 @@ def detect_hallucination(answer, misleading):
 
 def evaluate_ocr_image_to_text(model_id, scenario, task):
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('../../results/image_to_text/hallucination', scenario, task, model_name)
+    output_dir = os.path.join('results/image-to-text/hallucination', scenario, task, model_name)
     generation_file = os.path.join(output_dir, "generation.json")
     
     if not os.path.exists(generation_file):
@@ -77,22 +83,25 @@ def evaluate_ocr_image_to_text(model_id, scenario, task):
             hallucinated_number += 1
         else :
             results.append({"id":data["id"],"accuracy":0})
-    print(f"hallucination rate: {hallucinated_number/len(data_list)}")
+    accuracy = 1 - hallucinated_number/len(data_list)
+    print(f"Accuracy: {accuracy}")
+    result_dict = {}
+    result_dict["accuracy"] =  accuracy
+    result_dict["detail"] = results
     with open(f"{output_dir}/result.json", "w") as f:
-        json.dump(results, f, indent=4)
+        json.dump(result_dict, f, indent=4)
         
 
 def generate_ocr_text_to_image(model_id, task, client, seed, output_dir):
-    # Adjusted path to read data from the correct directory
-    base_dir = f'../../data/text_to_image/hallucination/ocr/'
+    
+    ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
+    ocr_folder = ds["ocr"]
     misleading, prompts,results = [], [],[]
-    input_file = base_dir + f"{task}.json"
-    with open(input_file, "r", encoding="utf-8") as json_file:
-        data = json.load(json_file)
-    for entry in data:
-        misleading.append(entry.get("keyword", ""))
-        prompts.append(entry.get("prompt", ""))
-        data_id = entry.get("id", "")
+    for entry in ocr_folder:
+        if entry["task"] == task:
+            misleading.append(entry.get("keyword", ""))
+            prompts.append(entry.get("prompt", ""))
+            data_id = entry.get("id", "")
         
     total_number = len(prompts)
     image_dir = output_dir+"/images"
@@ -124,7 +133,7 @@ def generate_ocr_text_to_image(model_id, task, client, seed, output_dir):
 
 def evaluate_ocr_text_to_image(model_id, scenario, task):
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('../../results/text_to_image/hallucination', scenario, task, model_name)
+    output_dir = os.path.join('results/text-to-image/hallucination', scenario, task, model_name)
     generation_file = os.path.join(output_dir, "generation.json")
     
     if not os.path.exists(generation_file):
@@ -154,6 +163,11 @@ def evaluate_ocr_text_to_image(model_id, scenario, task):
                 results.append({"id":data["id"],"detection_result":result,"keyword":data["keyword"],"accuracy":0})
             else :
                 results.append({"id":data["id"],"detection_result":result,"keyword":data["keyword"],"accuracy":1})
-    print(f"hallucination rate: {hallucinated_number/len(data_list)}")
+
+    accuracy = 1 - hallucinated_number/len(data_list)
+    print(f"Accuracy: {accuracy}")
+    result_dict = {}
+    result_dict["accuracy"] =  accuracy
+    result_dict["detail"] = results
     with open(f"{output_dir}/result.json", "w") as f:
-        json.dump(results, f, indent=4)
+        json.dump(result_dict, f, indent=4)
