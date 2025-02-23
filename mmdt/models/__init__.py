@@ -6,7 +6,7 @@ class Image2TextClient:
         if model_id == "models/gemini-1.5-pro-001":
             from .image_to_text.gemini import GeminiClient
             self.client = GeminiClient(model_id)
-        elif model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13"]:
+        elif model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13", "gpt-4o"]:
             from .image_to_text.gpt4v import GPT4VClient
             self.client = GPT4VClient(model_id)
         elif model_id == "claude-3-opus-20240229":

@@ -10,6 +10,7 @@ from mmdt.perspectives.hallucination.ocr import generate_ocr_image_to_text
 from mmdt.perspectives.hallucination.misleading import generate_misleading_image_to_text
 import tempfile
 from mmdt.perspectives.hallucination.scenario_list import all_scenarios
+from datasets import load_dataset
 
 def generate(kwargs):
 
@@ -36,10 +37,14 @@ def generate(kwargs):
 
     
     # Adjusted path to read data from the correct directory
-    file_path = os.path.join('data/image-to-text/hallucination', scenario, f'{task}.csv')
-    file = pd.read_csv(file_path)
-    img_ids = file['img_id'].tolist()
-    prompts = file['question'].tolist()
+    # file_path = os.path.join('data/image-to-text/hallucination', scenario, f'{task}.csv')
+    # file = pd.read_csv(file_path)
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
+    scenario_subset = ds[scenario]
+    img_ids = scenario_subset['image']
+    prompts = scenario_subset['question']
+
+    #### TODO: Get the subset corresponding to the task
 
     responses = []
 
@@ -50,9 +55,9 @@ def generate(kwargs):
 
 
     for i in tqdm(range(len(img_ids))):
-        img_id = int(img_ids[i])
+
         text = prompts[i]
-        image = coco.load_image(img_id)  # Ensure coco or equivalent loader is defined
+        image = scenario_subset['image'][i]
 
         additional_instruction = get_instruction_by_task(task)
         text += additional_instruction
@@ -67,7 +72,7 @@ def generate(kwargs):
                 finally:
                     os.remove(tmp.name)
         
-        responses.append({'img_id': img_id, 'response': response})
+        responses.append({'img_id': img_ids[i], 'response': response})
         print(response)
 
     del client

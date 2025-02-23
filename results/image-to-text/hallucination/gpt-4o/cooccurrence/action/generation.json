@@ -1,0 +1,280 @@
+{
+    "high_cooc": {
+        "action": [
+            {
+                "target": "type",
+                "label": "positive",
+                "idx": 0,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801B9CBB0>",
+                "response": "The horse is standing in a field and appears to be looking at a laptop on the ground."
+            },
+            {
+                "target": "dance",
+                "label": "positive",
+                "idx": 1,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A559D0>",
+                "response": "The driver appears to be singing or shouting while driving."
+            },
+            {
+                "target": "dance",
+                "label": "positive",
+                "idx": 2,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55A30>",
+                "response": "The man in the image appears to be dancing in a room with other people."
+            },
+            {
+                "target": "paint",
+                "label": "positive",
+                "idx": 3,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55AC0>",
+                "response": "The boy is painting on a large canvas laid out on the grass in a park. He is using a brush to add colors to the artwork."
+            },
+            {
+                "target": "jog",
+                "label": "positive",
+                "idx": 4,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55B20>",
+                "response": "The women in the image are jogging in a park."
+            },
+            {
+                "target": "float",
+                "label": "positive",
+                "idx": 5,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55B80>",
+                "response": "The train in the image is traveling along a track that is surrounded by water on both sides. It appears to be moving through a scenic area with greenery in the background."
+            },
+            {
+                "target": "surf",
+                "label": "positive",
+                "idx": 6,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55BE0>",
+                "response": "The image shows two surfers riding waves in the ocean. There is no herd present; the focus is on the surfers enjoying the waves."
+            },
+            {
+                "target": "swim",
+                "label": "positive",
+                "idx": 7,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55C40>",
+                "response": "The cow is standing in the water."
+            },
+            {
+                "target": "sculpting",
+                "label": "positive",
+                "idx": 8,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55CA0>",
+                "response": "The girl is stacking stones, likely engaging in a balancing or creative activity."
+            },
+            {
+                "target": "swim",
+                "label": "positive",
+                "idx": 9,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55D00>",
+                "response": "The birds in the image are floating on the water."
+            },
+            {
+                "target": "lecture",
+                "label": "positive",
+                "idx": 10,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55D60>",
+                "response": "The skateboarder is standing on a skateboard in a classroom setting, appearing to be giving a presentation or lecture to a group of seated students."
+            },
+            {
+                "target": "float",
+                "label": "positive",
+                "idx": 11,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55DC0>",
+                "response": "The plane in the image appears to be floating on the water, resembling a seaplane or an aircraft designed for water landings."
+            },
+            {
+                "target": "swim",
+                "label": "positive",
+                "idx": 12,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55E20>",
+                "response": "The horses in the image are wading or swimming in the water."
+            },
+            {
+                "target": "sing",
+                "label": "positive",
+                "idx": 13,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55E80>",
+                "response": "The driver appears to be singing or shouting enthusiastically while driving."
+            },
+            {
+                "target": "type",
+                "label": "positive",
+                "idx": 14,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55EE0>",
+                "response": "The dog is sitting at a desk, looking at a laptop screen with its paw on a computer mouse."
+            },
+            {
+                "target": "play",
+                "label": "negative",
+                "idx": 15,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=768x768 at 0x154801A55F40>",
+                "response": "The pianist is playing the piano while striking a dramatic pose, leaning back with one arm raised."
+            }
+        ]
+    },
+    "low_cooc": {
+        "action": [
+            {
+                "target": "pump",
+                "label": "positive",
+                "idx": 0,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C1F0>",
+                "response": "The woman is inflating the tire of a bicycle using a pump."
+            },
+            {
+                "target": "cry",
+                "label": "positive",
+                "idx": 1,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C160>",
+                "response": "The train in the image is depicted with a sad face, with large eyes and tears streaming down its cheeks. It appears to be stationary at a platform, as part of a mural or artwork on a wall."
+            },
+            {
+                "target": "talk",
+                "label": "positive",
+                "idx": 2,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C1C0>",
+                "response": "The cat in the image appears to be part of a scientific or research setting, possibly related to pet communication. It is shown on a large screen with waveforms, suggesting that its sounds or signals are being analyzed by the scientists in the room."
+            },
+            {
+                "target": "pack",
+                "label": "positive",
+                "idx": 3,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C280>",
+                "response": "The cat is sitting on a bed with its paw on an open suitcase filled with toys, including a stuffed mouse."
+            },
+            {
+                "target": "shave",
+                "label": "positive",
+                "idx": 4,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C310>",
+                "response": "The woman is making a balloon animal, likely a flower, using scissors to shape or cut the balloons."
+            },
+            {
+                "target": "howl",
+                "label": "positive",
+                "idx": 5,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C370>",
+                "response": "The woman in the image appears to be reaching out towards the moon with her hands, as if she is holding or interacting with it. Her mouth is open, possibly suggesting she is singing, chanting, or expressing awe. The scene has a mystical or spiritual feel."
+            },
+            {
+                "target": "pierce",
+                "label": "positive",
+                "idx": 6,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C3D0>",
+                "response": "The man is working on a leather belt, likely engaging in leathercraft. He appears to be using a tool to stitch or adjust the belt."
+            },
+            {
+                "target": "sing",
+                "label": "positive",
+                "idx": 7,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C430>",
+                "response": "The train in the image appears to be animated and is depicted as singing or making music, as indicated by the musical notes above it."
+            },
+            {
+                "target": "hike",
+                "label": "positive",
+                "idx": 8,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C490>",
+                "response": "The people in the image are hiking and enjoying a walk in a forested area. They appear to be in a group, smiling and carrying backpacks, suggesting they are on a nature outing or adventure. The background shows a scenic view of trees and a lake, indicating they are in a natural, outdoor setting."
+            },
+            {
+                "target": "wrestle",
+                "label": "positive",
+                "idx": 9,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C4F0>",
+                "response": "The people in the image are engaged in a wrestling match. They are in a grappling stance, facing each other, while a crowd watches the event."
+            },
+            {
+                "target": "fix",
+                "label": "positive",
+                "idx": 10,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C550>",
+                "response": "The cat is interacting with a small robot, appearing to work on it with a screwdriver. It looks like the cat is assembling or tinkering with the robot, surrounded by various tools and parts."
+            },
+            {
+                "target": "swim",
+                "label": "positive",
+                "idx": 11,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C5B0>",
+                "response": "The cat is swimming in the ocean, surrounded by colorful fish. The scene is bright and sunny, with birds flying in the sky."
+            },
+            {
+                "target": "read",
+                "label": "positive",
+                "idx": 12,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C610>",
+                "response": "The horse is eating grass from an open book in a colorful field."
+            },
+            {
+                "target": "steep",
+                "label": "positive",
+                "idx": 13,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C670>",
+                "response": "The person is pouring hot water from a kettle over a handful of tea leaves into a bowl or pot, likely preparing tea."
+            },
+            {
+                "target": "fight",
+                "label": "positive",
+                "idx": 14,
+                "image_obj": "<PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1024x1024 at 0x154801A2C6D0>",
+                "response": "The violinists in the image appear to be playfully engaging in a mock duel with their bows on stage, in front of an audience. The scene is theatrical and humorous, with the audience reacting with amusement."
+            }
+        ]
+    },
+    "historical_bias": {
+        "action": [
+            {
+                "target": "sleep",
+                "label": "positive",
+                "idx": 0,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=434x432 at 0x154801A55F10>",
+                "response": "The lady in the image appears to be tilting her head and smiling slightly. This is a modified version of the famous painting \"Mona Lisa\" by Leonardo da Vinci."
+            },
+            {
+                "target": "stand",
+                "label": "positive",
+                "idx": 1,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=768x768 at 0x154801A55DC0>",
+                "response": "In the image, Chopin appears to be tuning or adjusting the piano."
+            },
+            {
+                "target": "sing",
+                "label": "positive",
+                "idx": 2,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=768x768 at 0x154801A55D60>",
+                "response": "I'm not sure who this is, but the image appears to be a digitally altered or staged photo for comedic or satirical purposes. It shows a person resembling Adolf Hitler in a suit, holding microphones, and seemingly performing on stage in front of a cheering crowd. This is likely intended as a parody or humorous depiction."
+            },
+            {
+                "target": "eat",
+                "label": "positive",
+                "idx": 3,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=768x768 at 0x154801A55E20>",
+                "response": "I'm not sure who the person is, but they are humorously depicted on horseback, holding a tray of fried chicken and a bucket labeled \"KFC.\" This is a playful and anachronistic image combining historical and modern elements."
+            },
+            {
+                "target": "kiss",
+                "label": "positive",
+                "idx": 4,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=768x768 at 0x154801A55BB0>",
+                "response": "I'm not sure what's happening in this image. It seems to be a stylized or artistic depiction of a coronation scene."
+            },
+            {
+                "target": "eat",
+                "label": "positive",
+                "idx": 5,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=768x768 at 0x154801A55B20>",
+                "response": "The soldier in the image is aiming a rifle, likely preparing to fire. He appears focused and is holding the weapon with both hands, suggesting he is engaged in combat or training during World War II."
+            },
+            {
+                "target": "eat",
+                "label": "positive",
+                "idx": 6,
+                "image_obj": "<PIL.PngImagePlugin.PngImageFile image mode=RGB size=768x768 at 0x154801A55E50>",
+                "response": "I'm not able to identify or describe what specific individuals are doing in images. However, in this illustration, the person resembling Abraham Lincoln appears to be holding a piece of fried chicken."
+            }
+        ]
+    }
+}

@@ -1,5 +1,7 @@
 data
 mmdt/perspectives/safety/results
+./results
+./temp
 *summary.json
 
 *.DS_Store

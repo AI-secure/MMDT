@@ -12,7 +12,7 @@ class GPT4VClient:
     def __init__(self, model_id):
         self.api_key = os.getenv('OPENAI_API_KEY')
 
-        assert model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13"]
+        assert model_id in ["gpt-4-vision-preview", "gpt-4o-2024-05-13", "gpt-4o"]
         self.model_id = model_id
 
     def generate(self, text, image_path, **kwargs):
@@ -47,6 +47,7 @@ class GPT4VClient:
         }
 
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
         responses = [resp['message']['content'] for resp in response.json()['choices']]
         return responses[0]
 

@@ -8,6 +8,7 @@ import copy
 from mmdt.models.image_to_text.llava import LlavaClient
 from mmdt.detection import ImageDetector
 import torch
+from datasets import load_dataset
 
 def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
 
@@ -17,11 +18,11 @@ def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
 
     result_dict = {}
 
-    base_folder = f'data/text-to-image/hallucination/cooccurrence'
+    ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
 
-    high_cooc_folder = os.path.join(base_folder, "high_cooc")
-    low_cooc_folder = os.path.join(base_folder, "low_cooc")
-    historical_foler = os.path.join(base_folder, "historical_bias")
+    high_cooc_folder = ds["cooccurrence_high_cooc"]
+    low_cooc_folder = ds["cooccurrence_low_cooc"]
+    historical_foler = ds["cooccurrence_historical_bias"]
 
     all_category_list = [task]
 
@@ -30,21 +31,18 @@ def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
 
     for folder, type_folder in zip([high_cooc_folder, low_cooc_folder, historical_foler], ["high_cooc", "low_cooc", "historical_bias"]):
 
-
         folder_dict = {}
 
         for category in all_category_list:
 
-            prompt_dir = os.path.join(folder, category) + ".json"
-
+            data_source = []
             category_list = []
 
-            print("prompt_dir", prompt_dir)
-            with jsonlines.open(prompt_dir, "r") as f:
-                data_source = []
-                for idx, obj in enumerate(f):
+            for idx, obj in enumerate(folder):
 
+                if obj["task"] == category:
                     data_source.append(obj)
+
 
             print(f"Processing {category} prompts")
 
@@ -76,15 +74,17 @@ def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
 
 def generate_cooc_image_to_text(model_id, task, client, generation_configs, output_dir):
 
+    temp_dir = "./temp/hallucination/"
+
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
 
     result_dict = {}
 
-    base_folder = f'data/image-to-text/hallucination/cooccurrence'
-    image_base_dir = base_folder + "/images"
-
-    high_cooc_folder = os.path.join(base_folder, "high_cooc")
-    low_cooc_folder = os.path.join(base_folder, "low_cooc")
-    historical_foler = os.path.join(base_folder, "historical_bias")
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
+    high_cooc_folder = ds["cooccurrence_high_cooc"]
+    low_cooc_folder = ds["cooccurrence_low_cooc"]
+    historical_foler = ds["cooccurrence_historical_bias"]
 
     all_category_list = [task]
 
@@ -98,14 +98,11 @@ def generate_cooc_image_to_text(model_id, task, client, generation_configs, outp
 
         for category in all_category_list:
 
-            prompt_dir = os.path.join(prompt_folder, category) + ".json"
-
             category_list = []
-
-            with jsonlines.open(prompt_dir, "r") as f:
-                data_source = []
-                for idx, obj in enumerate(f):
-
+            
+            data_source = []
+            for idx, obj in enumerate(folder):
+                if obj["task"] == category:
                     data_source.append(obj)
 
             print(f"Processing {category} prompts")
@@ -113,14 +110,13 @@ def generate_cooc_image_to_text(model_id, task, client, generation_configs, outp
             for i_idx, item in tqdm(enumerate(data_source), total=len(data_source)):
 
                 new_item = {}
-                prompt = item["prompt"]
-                img_dir = image_base_dir + "/" + item["image_path"]
-                response = client.generate(prompt, img_dir, **generation_configs)
+                prompt = item["question"]
+                img = item["image"]
+                # save img to file
+                img_path = os.path.join(temp_dir, f"temp.png")
+                img.save(img_path)
 
-                # check if img_dir exists
-                if not os.path.exists(img_dir):
-                    print(f"Image not found: {img_dir}")
-                    input()
+                response = client.generate(prompt, img_path, **generation_configs)
 
                 new_item["target"] = item["target"]
                 new_item["label"] = item["label"]
@@ -128,7 +124,8 @@ def generate_cooc_image_to_text(model_id, task, client, generation_configs, outp
                     new_item["idx"] = item["idx"]
                 else:
                     new_item["idx"] = i_idx
-                new_item["image_path"] = img_dir
+
+                new_item["image_obj"] = str(img)
 
                 new_item["response"] = response
 
@@ -290,8 +287,7 @@ def evaluate_cooc_image_to_text(model_id, scenario, task):
                 else:
                     print("Error: label not found")
                     exit()
-                
-            # print(f"Category: {category} Accuracy: {acc/len(category_list)}")
+            
             try:
                 result_dict[category] = acc/len(category_list)
             except:
@@ -306,22 +302,6 @@ def evaluate_cooc_image_to_text(model_id, scenario, task):
 
     with open(f"{output_dir}/result.json", "w") as f:
         json.dump(result_dict, f, indent=4)
-
-    # try:
-    #     result_dict["Identification"] = object_acc/object_all
-    # except:
-    #     result_dict[folder] = 0
-
-
-
-    # print(f"Object Existence Accuracy: {object_acc/object_all}")
-    # print(f"Count Accuracy: {count_acc/count_all}")
-    # print(f"Attribute Accuracy: {attribute_acc/attribute_all}")
-    # print(f"Spatial Accuracy: {spatial_acc/spatial_all}")
-    # print(f"Action Accuracy: {action_acc/action_all}")
-
-    # print(f"Overall Accuracy: {acc_all/counter_all}")
-
 
 
 def evaluate_cooc_text_to_image(model_id, scenario, task):
