@@ -53,9 +53,20 @@ python mmdt/main.py --model_id {model_id}
 
 ### Evaluate each perspective
 
-To evaluate MMFMs with MMDT, we provide script examples for different perspectives under `./scripts`. For example, to evaluate `llava-hf/llava-v1.6-mistral-7b-hf` on hallucination under `natural selection` scenario and `action recognition` task, we can run the following example script.
+Specifically, you can evaluate your model on specific perspective, scenario, and task by running the following script:
+```
+python mmdt/main.py --modality {modality} --model_id {model_id} --perspectives {perspective} --scenario {scenario} --task {task}
+```
+
+For example, to evaluate `gpt-4o` on hallucination under `natural selection` scenario and `action recognition` task, we can run the following example script.
 ```bash
-bash script/hallucination.sh
+python mmdt/main.py --modality image_to_text --model_id gpt-4o --perspectives hallucination --scenario natural --task action
+```
+
+Moreover, we also provide off-the-shelf scripts for evaluating each perspective under `./scripts`.
+For example, the following script evaluates all scenarios and tasks for hallucination perspective.
+```bash
+bash scripts/hallucination_i2t.sh gpt-4o
 ```
 
 ### Notes
