@@ -2,7 +2,6 @@
 
 # Usage: ./hallucination_i2t.sh <model_id>
 
-
 MODEL_ID=$1
 
 # Make sure the user supplied a model_id
@@ -12,13 +11,27 @@ if [ -z "$MODEL_ID" ]; then
   exit 1
 fi
 
-# Arrays for scenarios and tasks
+# Scenarios
 SCENARIOS=("natural" "counterfactual" "misleading" "distraction" "ocr" "cooccurrence")
-TASKS=("identification" "attribute" "spatial" "count" "action")
 
-# Loop over each scenario and task
+# Tasks for most scenarios
+DEFAULT_TASKS=("identification" "attribute" "spatial" "count" "action")
+
+# Tasks only for the "ocr" scenario
+OCR_TASKS=("contradictory" "cooccur" "doc" "scene")
+
+# Loop over each scenario
 for scenario in "${SCENARIOS[@]}"; do
-  for task in "${TASKS[@]}"; do
+  
+  # If the scenario is "ocr", use OCR_TASKS; otherwise, use DEFAULT_TASKS
+  if [ "$scenario" == "ocr" ]; then
+    tasks=("${OCR_TASKS[@]}")
+  else
+    tasks=("${DEFAULT_TASKS[@]}")
+  fi
+
+  # Loop over tasks for the current scenario
+  for task in "${tasks[@]}"; do
     echo "Running with scenario=${scenario}, task=${task}, model_id=${MODEL_ID}"
     python ./mmdt/main.py \
       --modality image_to_text \

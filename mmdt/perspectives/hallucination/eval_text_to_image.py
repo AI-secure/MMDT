@@ -38,14 +38,14 @@ def evaluate(kwargs):
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize clients or detectors based on the task
-    if task == 'attribute':
-        client = Image2TextClient(model_id="llava-hf/llava-v1.6-mistral-7b-hf")
-        generation_configs = {'do_sample': False, 'temperature': 0, 'max_new_tokens': 128}
+    # if task == 'attribute':
+    client = Image2TextClient(model_id="llava-hf/llava-v1.6-mistral-7b-hf")
+    generation_configs = {'do_sample': False, 'temperature': 0, 'max_new_tokens': 128}
 
     results = []
     for current_data in tqdm(data, desc=f"Evaluating with {model_id}"):
         path = os.path.join(output_dir, f"{current_data['id']}.png")
-        result = evaluate_task(client, current_data, img_id, path, task, generation_configs if 'generation_configs' in locals() else None)
+        result = evaluate_task(client, current_data, current_data['id'], path, task, generation_configs if 'generation_configs' in locals() else None)
         results.append(result)
 
     # Save the results to a CSV file
@@ -53,7 +53,7 @@ def evaluate(kwargs):
     result_file = os.path.join(output_dir, 'evaluation.csv')
     df_results.to_csv(result_file, index=False)
 
-def evaluate_task(client, data, img_id, image_path, task, generation_configs=None):
+def evaluate_task(client, current_data, img_id, image_path, task, generation_configs=None):
     """ Evaluate a specific task based on the provided image and task type. """
     if task == 'attribute':
         question = current_data['checking_question']

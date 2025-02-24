@@ -89,7 +89,8 @@ def modify_image_with_boxes(image, bboxes):
     return image
 
 class LLMChat(nn.Module):
-    def __init__(self, model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'):
+    # def __init__(self, model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'):
+    def __init__(self, model_name = '/scratch/czr/hf_models/models--meta-llama--Meta-Llama-3-8B-Instruct/snapshots/e1945c40cd546c78e41f1151f4db032b271faeaa'):
         super(LLMChat, self).__init__()
         self.pipeline = transformers.pipeline(
                 "text-generation",
