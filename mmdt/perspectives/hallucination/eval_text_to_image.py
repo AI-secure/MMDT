@@ -14,6 +14,11 @@ from datasets import load_dataset
 
 def evaluate(kwargs):
 
+    if not os.path.exists('./mmdt/detection/GroundingDINO/weights'):
+        os.makedirs('./mmdt/detection/GroundingDINO/weights')
+    if not os.path.exists('./mmdt/detection/GroundingDINO/weights/groundingdino_swinb_cogcoor.pth'):
+        os.system('wget -q https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha2/groundingdino_swinb_cogcoor.pth -O ./mmdt/detection/GroundingDINO/weights/groundingdino_swinb_cogcoor.pth')
+
     model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
     model_name = model_id.replace('/', '_')
     if scenario == "ocr":

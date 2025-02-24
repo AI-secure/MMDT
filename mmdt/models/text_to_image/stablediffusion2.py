@@ -5,7 +5,7 @@ import torch
 class StableDiffusion2Client:
     def __init__(self, model_id):
         self.device = "cuda"
-        assert model_id == "stabilityai/stable-diffusion-2"
+        # assert model_id == "stabilityai/stable-diffusion-2"
         self.scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
         self.pipe = StableDiffusionPipeline.from_pretrained(model_id, scheduler=self.scheduler, torch_dtype=torch.float16)
         self.pipe = self.pipe.to(self.device)
