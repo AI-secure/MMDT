@@ -23,13 +23,13 @@ def evaluate(kwargs):
     model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
     model_name = model_id.replace('/', '_')
     if scenario == "ocr":
-        evaluate_ocr_text_to_image(model_id, scenario, task)
+        evaluate_ocr_text_to_image(model_name, scenario, task)
         return
     elif scenario == "misleading":
-        evaluate_misleading_text_to_image(model_id, scenario, task)
+        evaluate_misleading_text_to_image(model_name, scenario, task)
         return
     elif scenario == "cooccurrence":
-        evaluate_cooc_text_to_image(model_id, scenario, task)
+        evaluate_cooc_text_to_image(model_name, scenario, task)
         return
 
     ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
@@ -42,7 +42,9 @@ def evaluate(kwargs):
     generation_configs = {'do_sample': False, 'temperature': 0, 'max_new_tokens': 128}
 
     results = []
-    for current_data in tqdm(data, desc=f"Evaluating with {model_id}"):
+    for idx, current_data in tqdm(enumerate(data), desc=f"Evaluating with {model_id}", total=len(data)):
+        if idx > 5:
+            break
         img_id = current_data['id']
         path = os.path.join(output_dir, f"{img_id}.png")
         result = evaluate_task(client, current_data, img_id, path, task, generation_configs)

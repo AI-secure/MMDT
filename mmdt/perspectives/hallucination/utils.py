@@ -5,6 +5,7 @@ from pycocotools.coco import COCO
 import os
 from PIL import Image, ImageDraw
 import random
+import requests
 
 def determine_relative_position(bbox1, bbox2):
     """ Determine the relative position between two bounding boxes. """
@@ -90,9 +91,12 @@ def modify_image_with_boxes(image, bboxes):
 
 class LLMChat(nn.Module):
     def __init__(self, model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'):
-    # def __init__(self, model_name = '/scratch/czr/hf_models/models--meta-llama--Meta-Llama-3-8B-Instruct/snapshots/e1945c40cd546c78e41f1151f4db032b271faeaa'):
         super(LLMChat, self).__init__()
-        self.pipeline = transformers.pipeline(
+        if model_name == 'gpt-4o':
+            self.api_key = os.getenv('OPENAI_API_KEY')
+            self.forward = self.forward_gpt4o
+        else:
+            self.pipeline = transformers.pipeline(
                 "text-generation",
                 model=model_name,
                 model_kwargs={"torch_dtype": torch.float16},
@@ -124,3 +128,33 @@ class LLMChat(nn.Module):
         )
         
         return outputs[0]["generated_text"][len(prompt):]
+
+    def forward_gpt4o(self, prompt):
+        temperature = 0
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+
+        payload = {
+            "model": "gpt-4o",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt
+                        }
+                    ]
+                }
+            ],
+            "max_tokens": 300,
+            "temperature": temperature
+        }
+
+        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+        responses = [resp['message']['content'] for resp in response.json()['choices']]
+        
+        return responses[0]

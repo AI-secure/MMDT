@@ -14,6 +14,7 @@ fi
 # Scenarios
 SCENARIOS=("natural" "counterfactual" "misleading" "distraction" "ocr" "cooccurrence")
 
+
 # Default tasks (for all scenarios except "ocr")
 DEFAULT_TASKS=("identification" "attribute" "spatial" "count")
 

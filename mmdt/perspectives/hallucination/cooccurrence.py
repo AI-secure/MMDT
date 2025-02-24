@@ -43,7 +43,7 @@ def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
                 if obj["task"] == category:
                     data_source.append(obj)
 
-
+            data_source = data_source[:5]
             print(f"Processing {category} prompts")
 
             for i_idx, item in tqdm(enumerate(data_source), total=len(data_source)):
@@ -107,6 +107,7 @@ def generate_cooc_image_to_text(model_id, task, client, generation_configs, outp
                 if obj["task"] == category:
                     data_source.append(obj)
 
+            data_source = data_source[:5]
             print(f"Processing {category} prompts")
 
             for i_idx, item in tqdm(enumerate(data_source), total=len(data_source)):
@@ -146,9 +147,9 @@ def generate_cooc_image_to_text(model_id, task, client, generation_configs, outp
 
 
 
-def evaluate_cooc_image_to_text(model_id, scenario, task):
+def evaluate_cooc_image_to_text(model_name, scenario, task):
 
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    # model_name = model_id.split("/")[1] if '/' in model_id else model_id
     output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
     generation_file = os.path.join(output_dir, "generation.json")
     
@@ -306,10 +307,9 @@ def evaluate_cooc_image_to_text(model_id, scenario, task):
         json.dump(result_dict, f, indent=4)
 
 
-def evaluate_cooc_text_to_image(model_id, scenario, task):
+def evaluate_cooc_text_to_image(model_name, scenario, task):
 
-
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    # model_name = model_id.split("/")[1] if '/' in model_id else model_id
     output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     generation_file = os.path.join(output_dir, "generation.json")
     
@@ -319,7 +319,6 @@ def evaluate_cooc_text_to_image(model_id, scenario, task):
         data = json.load(f)
 
     client = LlavaClient("llava-hf/llava-v1.6-mistral-7b-hf")
-
     generation_configs = {'do_sample': False, 'max_new_tokens': 128}
 
 
@@ -366,7 +365,7 @@ def evaluate_cooc_text_to_image(model_id, scenario, task):
 
         for category in tqdm(all_category_list):
 
-            category_list = folder_dict[category]
+            category_list = folder_dict[category][:10]
 
 
             acc = 0
@@ -563,20 +562,20 @@ def evaluate_cooc_text_to_image(model_id, scenario, task):
 
                     if folder == "high_cooc":
 
-                        obj1 = item["obj_1"]
-                        obj2 = item["obj_2"]
+                        obj1 = item["concept1"]
+                        obj2 = item["concept2"]
                         target_spatial = item["target"]
                     
                     elif folder == "low_cooc":
 
-                        obj1 = item["object_pair"][0]
-                        obj2 = item["object_pair"][1]
-                        target_spatial = item["positive_relation"]
+                        obj1 = item["concept1"]
+                        obj2 = item["concept2"]
+                        target_spatial = item["target"]
 
                     elif folder == "historical_bias":
-                        obj1 = item["obj_1"]
-                        obj2 = item["obj_2"]
-                        target_spatial = item["positive_relation"]
+                        obj1 = item["concept1"]
+                        obj2 = item["concept2"]
+                        target_spatial = item["target"]
 
 
                     sample_dict = {
@@ -640,23 +639,6 @@ def evaluate_cooc_text_to_image(model_id, scenario, task):
         result_dict[folder]["overall"] = acc_type/counter_type
         # print("\n")
 
-    # print(f"Object Existence Accuracy: {object_acc/object_all}")
-    # print(f"Count Accuracy: {count_acc/count_all}")
-    # print(f"Attribute Accuracy: {attribute_acc/attribute_all}")
-    # print(f"Spatial Accuracy: {spatial_acc/spatial_all}")
-
-    # print(f"Overall Accuracy: {acc_all/counter_all}")
-
-    # result_dict["Object Existence Accuracy"] = object_acc/object_all
-    # result_dict["Count Accuracy"] = count_acc/count_all
-    # result_dict["Attribute Accuracy"] = attribute_acc/attribute_all
-    # result_dict["Spatial Accuracy"] = spatial_acc/spatial_all
-
-    # result_dict["Overall Accuracy"] = acc_all/counter_all
-
-    # identifier = args.input_json.split("/")[-1].split(".")[0]
-    # with open(f"co-occurrence/evaluation/result_t2ichallenging/metric_result/{identifier}.json", "w") as f:
-    #     json.dump(result_dict, f, indent=4)
 
     with open(f"{output_dir}/result.json", "w") as f:
         json.dump(result_dict, f, indent=4)

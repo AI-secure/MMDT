@@ -64,10 +64,12 @@ python mmdt/main.py --modality image_to_text --model_id gpt-4o --perspectives ha
 ```
 
 Moreover, we also provide off-the-shelf scripts for evaluating each perspective under `./scripts`.
-For example, the following script evaluates all scenarios and tasks for hallucination perspective.
+For example, the following script evaluates all scenarios and tasks of image-to-text modality for the hallucination perspective.
 ```bash
 bash scripts/hallucination_i2t.sh gpt-4o
 ```
+
+An example of the output can be found [here]()
 
 ### Notes
 + Each of the six areas has its subdirectory containing the respective code and README.

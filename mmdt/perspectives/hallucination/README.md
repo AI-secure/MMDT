@@ -14,8 +14,14 @@ This directory contains scripts for generating and evaluating hallucinations in 
 
 ### Generating Results
 
-To generate results, you need to specify the model, scenario, and task you want to execute. Here are the command-line arguments you need to provide:
+To generate results, we recommend you use the main endpoint of MMDT, where you can specify the model, scenario, and task you want to execute. Here are the command-line arguments you need to provide:
 
+```
+python mmdt/main.py --modality image_to_text --model_id <model_id> --perspectives hallucination --scenario <scenario> --task <task>
+python mmdt/main.py --modality text_to_image --model_id <model_id> --perspectives hallucination --scenario <scenario> --task <task>
+```
+
+Alternatively, you can run the following scripts to exclusively evaluate hallucination perspective on image-to-text and text-to-image modalities.
 ```
 python generate_image_to_text.py --model_id <model_id> --scenario <scenario> --task <task>
 python generate_text_to_image.py --model_id <model_id> --scenario <scenario> --task <task>
@@ -24,17 +30,23 @@ python generate_text_to_image.py --model_id <model_id> --scenario <scenario> --t
 The full list of scenario and task on image_to_text is show below (scenario: task):
 
 ```
-natural: attribute, count, identification, spatial
-distraction: attribute, count, identification, spatial
-counterfactual: attribute, count, identification, spatial
+natural: attribute, count, identification, spatial, action
+distraction: attribute, count, identification, spatial, action
+counterfactual: attribute, count, identification, spatial, action
+cooccurrence: attribute, count, identification, spatial, action
+misleading: attribute, count, identification, spatial, action
+ocr: contradictory, cooccur, doc, scene
 ```
 
 While, the full list of scenario and task on text_to_image is show below (scenario: task):
 
 ```
-natural: attribute, count, identification, spatial, action
-distraction: attribute, count, identification, spatial, action
+natural: attribute, count, identification, spatial
+distraction: attribute, count, identification, spatial
 counterfactual: attribute, count, identification, spatial
+cooccurrence: attribute, count, identification, spatial
+misleading: attribute, count, identification, spatial
+ocr: complex, contradictory, distortion, misleading
 ```
 
 ### Evaluating Results
@@ -51,3 +63,137 @@ python eval_text_to_image.py --model_id <model_id> --scenario <scenario> --task 
 - `--model_id`: Model ID whose results are to be evaluated (required).
 - `--scenario`: Scenario type, defaults to 'natural'.
 - `--task`: Type of task to be evaluated, defaults to 'identification'.
+
+
+### An example of the summarized output:
+
+Aggregated results:
+```json
+{
+    "adv": null,
+    "fairness": null,
+    "hallucination": {
+        "image-to-text": {
+            "llava-hf_llava-v1.6-mistral-7b-hf": {
+                "cooccurrence": 0.4,
+                "counterfactual": 0.24166666666666667,
+                "distraction": 0.5133333333333333,
+                "misleading": 0.6200000000000001,
+                "natural": 0.1,
+                "ocr": 0.024999999999999994
+            }
+        },
+        "text-to-image": {
+            "_scratch_czr_hf_models_stable-diffusion-2": {
+                "cooccurrence": 0.2833333333333333,
+                "counterfactual": 0.16666666666666666,
+                "distraction": 0.5,
+                "misleading": 0.225,
+                "natural": 0.3333333333333333,
+                "ocr": 0.6666666666666667
+            }
+        }
+    },
+    "ood": null,
+    "privacy": null,
+    "safety": null
+}
+```
+
+Breakdown results:
+```json
+{
+    "adv": null,
+    "fairness": null,
+    "hallucination": {
+        "image-to-text": {
+            "llava-hf_llava-v1.6-mistral-7b-hf": {
+                "cooccurrence": {
+                    "action": 0.2,
+                    "attribute": 0.4,
+                    "count": 0.2,
+                    "identification": 0.6,
+                    "spatial": 0.6
+                },
+                "counterfactual": {
+                    "action": null,
+                    "attribute": 0.1,
+                    "count": 0.5666666666666667,
+                    "identification": 0.3,
+                    "spatial": 0.0
+                },
+                "distraction": {
+                    "action": 0.5,
+                    "attribute": 0.6,
+                    "count": 0.6666666666666666,
+                    "identification": 0.8,
+                    "spatial": 0.0
+                },
+                "misleading": {
+                    "action": 0.5,
+                    "attribute": 0.8,
+                    "count": 0.19999999999999996,
+                    "identification": 0.8,
+                    "spatial": 0.8
+                },
+                "natural": {
+                    "action": 0.0,
+                    "attribute": 0.0,
+                    "count": 0.39999999999999997,
+                    "identification": 0.1,
+                    "spatial": 0.0
+                },
+                "ocr": {
+                    "contradictory": 0.0,
+                    "cooccur": 0.0,
+                    "doc": 0.09999999999999998,
+                    "scene": 0.0
+                }
+            }
+        },
+        "text-to-image": {
+            "_scratch_czr_hf_models_stable-diffusion-2": {
+                "cooccurrence": {
+                    "attribute": 0.5333333333333333,
+                    "count": 0.0,
+                    "identification": 0.3333333333333333,
+                    "spatial": 0.26666666666666666
+                },
+                "counterfactual": {
+                    "attribute": 0.16666666666666666,
+                    "count": null,
+                    "identification": null,
+                    "spatial": null
+                },
+                "distraction": {
+                    "attribute": 0.5,
+                    "count": null,
+                    "identification": null,
+                    "spatial": null
+                },
+                "misleading": {
+                    "attribute": 0.30000000000000004,
+                    "count": 0.0,
+                    "identification": 0.4666666666666667,
+                    "spatial": 0.1333333333333333
+                },
+                "natural": {
+                    "attribute": 0.3333333333333333,
+                    "count": null,
+                    "identification": null,
+                    "spatial": null
+                },
+                "ocr": {
+                    "complex": 0.6666666666666667,
+                    "contradictory": 0.6666666666666667,
+                    "distortion": 0.6666666666666667,
+                    "misleading": 0.6666666666666667
+                }
+            }
+        }
+    },
+    "ood": null,
+    "privacy": null,
+    "safety": null
+}
+```

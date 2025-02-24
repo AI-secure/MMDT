@@ -7,6 +7,8 @@ from transformers import (
     LlavaNextForConditionalGeneration,
 )
 from datasets import load_dataset
+from mmdt.models.image_to_text.llava import LlavaClient
+
 
 def generate_misleading_image_to_text(model_id, task, client, generation_configs, output_dir):
     
@@ -27,12 +29,14 @@ def generate_misleading_image_to_text(model_id, task, client, generation_configs
             img.save(image_path)
             image_paths.append(image_path)
         
-    total_number = len(question_array)
+    # total_number = len(question_array)
+    total_number = 10
     for i in range(0, total_number):
         question = question_array[i]
         image_path = image_paths[i]
         response = client.generate(question, image_path, **generation_configs)
         results.append({"id":i,"question":question,"keyword":misleading[i],"response":response})
+
     with open(f"{output_dir}/generation.json", "w") as f:
         json.dump(results, f, indent=4)
 
@@ -57,9 +61,9 @@ def detect_hallucination(answer, misleading):
         result = False
     return result
 
-def evaluate_misleading_image_to_text(model_id, scenario, task):
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('results/image-to-text/hallucination', scenario, task, model_name)
+def evaluate_misleading_image_to_text(model_name, scenario, task):
+    # model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
     generation_file = os.path.join(output_dir, "generation.json")
     
     if not os.path.exists(generation_file):
@@ -115,6 +119,7 @@ def generate_misleading_text_to_image(model_id, task, client, seed, output_dir):
             prompts.append(entry.get("prompt", ""))
             
     total_number = max(len(objects), len(attribute), len(number), len(relation_objects), len(spatial_relation), len(prompts))
+    total_number = 10
     image_dir = output_dir+"/images"
     os.makedirs(image_dir, exist_ok=True)
     num_generation = 1 if model_id in ["dall-e-2", "dall-e-3"] else 3
@@ -154,21 +159,24 @@ def determine_relative_position(x1, y1, x2, y2):
         return ["under"]
 
 
-def evaluate_misleading_text_to_image(model_id, scenario, task):
+def evaluate_misleading_text_to_image(model_name, scenario, task):
 
-    import torch
 
-    processor_llava16 = LlavaNextProcessor.from_pretrained(
-        "llava-hf/llava-v1.6-mistral-7b-hf"
-    )
-    model_llava16 = LlavaNextForConditionalGeneration.from_pretrained(
-        "llava-hf/llava-v1.6-mistral-7b-hf", torch_dtype=torch.float16
-    )
-    model_llava16.to("cuda")
+    # processor_llava16 = LlavaNextProcessor.from_pretrained(
+    #     "llava-hf/llava-v1.6-mistral-7b-hf"
+    # )
+    # model_llava16 = LlavaNextForConditionalGeneration.from_pretrained(
+    #     "llava-hf/llava-v1.6-mistral-7b-hf", torch_dtype=torch.float16
+    # )
+    # model_llava16.to("cuda")
+
+    client = LlavaClient("llava-hf/llava-v1.6-mistral-7b-hf")
+    generation_configs = {'do_sample': False, 'max_new_tokens': 128}
+
 
     detector = ImageDetector()
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('results/text-to-image/hallucination', scenario, task, model_name)
+    # model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     generation_file = os.path.join(output_dir, "generation.json")
     
     if not os.path.exists(generation_file):
@@ -198,15 +206,16 @@ def evaluate_misleading_text_to_image(model_id, scenario, task):
             results.append({"id":i,"detection_result":"No image","accuracy":0})
         else:
             if task == "attribute":
-                image = Image.open(image_paths[i])
+                # image = Image.open(image_paths[i])
                 question = f"Is the {objects[i]} {attribute[i]}? Please provide the answer with 'Yes' or 'No'"
-                prompt = f"[INST] <image>\n{question} [/INST]"
-                inputs = processor_llava16(prompt, image, return_tensors="pt").to(
-                            "cuda:3"
-                        )
-                output = model_llava16.generate(**inputs, max_new_tokens=100)
-                answer = processor_llava16.decode(output[0], skip_special_tokens=True)
-                answer = answer.split("[/INST]")[1].strip()
+                # prompt = f"[INST] <image>\n{question} [/INST]"
+                # inputs = processor_llava16(prompt, image, return_tensors="pt").to(
+                #             "cuda:3"
+                #         )
+                # output = model_llava16.generate(**inputs, max_new_tokens=100)
+                # answer = processor_llava16.decode(output[0], skip_special_tokens=True)
+                answer = client.generate(question, image_paths[i], **generation_configs)
+                # answer = answer.split("[/INST]")[1].strip()
                 if "no" in answer.lower():
                     hallucinated_number += 1
                     results.append({"id":i,"detection_result":answer,"accuracy":0})

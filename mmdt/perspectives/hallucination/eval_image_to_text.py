@@ -28,24 +28,25 @@ def extract_counts_as_list(response, objects):
 def evaluate(kwargs):
     model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
 
+    model_name = model_id.replace('/', '_')
     if scenario == "ocr":
-        evaluate_ocr_image_to_text(model_id, scenario, task)
+        evaluate_ocr_image_to_text(model_name, scenario, task)
         return
     elif scenario == "misleading":
-        evaluate_misleading_image_to_text(model_id, scenario, task)
+        evaluate_misleading_image_to_text(model_name, scenario, task)
         return
     elif scenario == "cooccurrence":
-        evaluate_cooc_image_to_text(model_id, scenario, task)
+        evaluate_cooc_image_to_text(model_name, scenario, task)
         return
 
-    model_name = model_id.replace('/', '_')
+    
     ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
     data = ds[scenario].filter(lambda x: x['task'] == task)[:10]
     img_ids = data['id'][:10]
     questions = data['question'][:10]
     answers = data['answer'][:10]
 
-    model = LLMChat()  # Initialize the model once per function call
+    model = LLMChat('gpt-4o')  # Initialize the model once per function call
     output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
     responses_path = os.path.join(output_dir, f'generation.csv')
     responses = pd.read_csv(responses_path)['response'].tolist()

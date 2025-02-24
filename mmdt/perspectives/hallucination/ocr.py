@@ -3,6 +3,7 @@ import json
 from PIL import Image
 import easyocr
 from datasets import load_dataset
+
 def generate_ocr_image_to_text(model_id, task, client, generation_configs, output_dir):
     
     temp_dir = "./temp/hallucination/"
@@ -23,6 +24,7 @@ def generate_ocr_image_to_text(model_id, task, client, generation_configs, outpu
             image_paths.append(image_path)
         
     total_number = len(question_array)
+    total_number = 10
     for i in range(0, total_number):
         question = question_array[i]
         image_path = image_paths[i]
@@ -52,9 +54,9 @@ def detect_hallucination(answer, misleading):
         result = False
     return result
 
-def evaluate_ocr_image_to_text(model_id, scenario, task):
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('results/image-to-text/hallucination', scenario, task, model_name)
+def evaluate_ocr_image_to_text(model_name, scenario, task):
+    # model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
     generation_file = os.path.join(output_dir, "generation.json")
     
     if not os.path.exists(generation_file):
@@ -104,6 +106,7 @@ def generate_ocr_text_to_image(model_id, task, client, seed, output_dir):
             data_id = entry.get("id", "")
         
     total_number = len(prompts)
+    total_number = 10
     image_dir = output_dir+"/images"
     os.makedirs(image_dir, exist_ok=True)
     num_generation = 1 if model_id in ["dall-e-2", "dall-e-3"] else 3
@@ -131,9 +134,9 @@ def generate_ocr_text_to_image(model_id, task, client, seed, output_dir):
         json.dump(results, f, indent=4)
 
 
-def evaluate_ocr_text_to_image(model_id, scenario, task):
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('results/text-to-image/hallucination', scenario, task, model_name)
+def evaluate_ocr_text_to_image(model_name, scenario, task):
+    # model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     generation_file = os.path.join(output_dir, "generation.json")
     
     if not os.path.exists(generation_file):
@@ -149,7 +152,7 @@ def evaluate_ocr_text_to_image(model_id, scenario, task):
         })
     hallucinated_number = 0
     results = []
-    for data in data_list:
+    for data in data_list[:10]:
         if data["image_path"] == "error":
             hallucinated_number += 1
             results.append({"id":data["id"],"detection_result":"No image","keyword":data["keyword"],"accuracy":0})
