@@ -1,8 +1,9 @@
+import sys
+sys.path.append("./")
+
 import argparse
 from importlib import import_module
 from mmdt.summarize import summarize_results
-
-
 
 PERSPECTIVES = ["safety", "hallucination", "fairness", "privacy", "adv", "ood"]
 KNOWN_MODEL_MODALITY = {

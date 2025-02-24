@@ -10,11 +10,12 @@ from mmdt.perspectives.hallucination.scenario_list import all_scenarios
 from mmdt.perspectives.hallucination.cooccurrence import evaluate_cooc_text_to_image
 from mmdt.perspectives.hallucination.ocr import evaluate_ocr_text_to_image
 from mmdt.perspectives.hallucination.misleading import evaluate_misleading_text_to_image
+from datasets import load_dataset
 
 def evaluate(kwargs):
 
     model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
-
+    model_name = model_id.replace('/', '_')
     if scenario == "ocr":
         evaluate_ocr_text_to_image(model_id, scenario, task)
         return
@@ -25,13 +26,10 @@ def evaluate(kwargs):
         evaluate_cooc_text_to_image(model_id, scenario, task)
         return
 
-    """ Main function to perform image evaluations. """
-    # Adjust the paths for the data and results directories
-    file_path = os.path.join('data/text_to_image/hallucination', scenario, f'{task}.csv')
-    file = pd.read_csv(file_path)
-    img_ids = file['img_id'].tolist()
+    ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
+    data = ds[scenario].filter(lambda x: x['task'] == task)
 
-    output_dir = os.path.join('results/text_to_image/hallucination', model_name, scenario, task)
+    output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize clients or detectors based on the task
@@ -39,12 +37,10 @@ def evaluate(kwargs):
         client = Image2TextClient(model_id="llava-hf/llava-v1.6-mistral-7b-hf")
         generation_configs = {'do_sample': False, 'temperature': 0, 'max_new_tokens': 128}
 
-    detect_model = ImageDetector()
-
     results = []
-    for img_id in tqdm(img_ids, desc=f"Evaluating with {model_id}"):
-        path = os.path.join(output_dir, f'{img_id}.png')
-        result = evaluate_task(detect_model, client, file, img_id, path, task, generation_configs if 'generation_configs' in locals() else None)
+    for current_data in tqdm(data, desc=f"Evaluating with {model_id}"):
+        path = os.path.join(output_dir, f"{current_data['id']}.png")
+        result = evaluate_task(client, current_data, img_id, path, task, generation_configs if 'generation_configs' in locals() else None)
         results.append(result)
 
     # Save the results to a CSV file
@@ -52,16 +48,17 @@ def evaluate(kwargs):
     result_file = os.path.join(output_dir, 'evaluation.csv')
     df_results.to_csv(result_file, index=False)
 
-def evaluate_task(model, client, file, img_id, image_path, task, generation_configs=None):
+def evaluate_task(client, data, img_id, image_path, task, generation_configs=None):
     """ Evaluate a specific task based on the provided image and task type. """
     if task == 'attribute':
-        question = file.loc[file['img_id'] == img_id, 'checking_question'].item()
+        question = current_data['checking_question']
         response = client.generate(f"{question} Please provide the answer with 'Yes' or 'No'.", Image.open(image_path), **generation_configs)
         accuracy = 1 if 'yes' in response.lower() else 0
         return {'img_id': img_id, 'response': response, 'accuracy': accuracy}
     elif task == 'spatial':
-        objects = eval(file.loc[file['img_id'] == img_id, 'objects'].item())
-        relations = eval(file.loc[file['img_id'] == img_id, 'relations'].item())
+        model = ImageDetector()
+        objects = eval(current_data['objects'])
+        relations = (current_data['relations'])
         return evaluate_spatial_relationships(model, objects, relations, image_path)
 
 def evaluate_spatial_relationships(model, objects, relations, image_path):

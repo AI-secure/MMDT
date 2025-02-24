@@ -9,6 +9,7 @@ from mmdt.perspectives.hallucination.scenario_list import all_scenarios
 from mmdt.perspectives.hallucination.cooccurrence import evaluate_cooc_image_to_text
 from mmdt.perspectives.hallucination.ocr import evaluate_ocr_image_to_text
 from mmdt.perspectives.hallucination.misleading import evaluate_misleading_image_to_text
+from datasets import load_dataset
 
 def extract_counts_as_list(response, objects):
     import re
@@ -37,16 +38,15 @@ def evaluate(kwargs):
         evaluate_cooc_image_to_text(model_id, scenario, task)
         return
 
-
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    file_path = os.path.join('../../data/image_to_text/hallucination', model_name, scenario, f'{task}.csv')
-    data = pd.read_csv(file_path)
-    img_ids = data['img_id'].tolist()
-    questions = data['question'].tolist()
-    answers = data['answer'].tolist()
+    model_name = model_id.replace('/', '_')
+    ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
+    data = ds[scenario].filter(lambda x: x['task'] == task)[:10]
+    img_ids = data['id'][:10]
+    questions = data['question'][:10]
+    answers = data['answer'][:10]
 
     model = LLMChat()  # Initialize the model once per function call
-    output_dir = os.path.join('../../results/image_to_text/hallucination', model_name, scenario, task)
+    output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
     responses_path = os.path.join(output_dir, f'generation.csv')
     responses = pd.read_csv(responses_path)['response'].tolist()
 

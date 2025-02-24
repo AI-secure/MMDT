@@ -1,6 +1,6 @@
 transformers
 diffusers
-datasets
+datasets==2.18.0
 accelerate
 google-generativeai
 anthropic
@@ -13,6 +13,8 @@ spacy
 supervision
 addict
 yapf
+sentry_sdk
+easyocr
 pycocotools
 timm
 -e git+https://github.com/openai/CLIP.git@main#egg=clip

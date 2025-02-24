@@ -7,16 +7,15 @@ from mmdt.perspectives.hallucination.cooccurrence import generate_cooc_text_to_i
 from mmdt.perspectives.hallucination.ocr import generate_ocr_text_to_image
 from mmdt.perspectives.hallucination.misleading import generate_misleading_text_to_image
 from mmdt.perspectives.hallucination.scenario_list import all_scenarios
+from datasets import load_dataset
 
 def generate(kwargs):
+    seed = 0
     model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
-
     # Define the output directory based on model name, scenario, and task
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    model_name = model_id.replace('/', '_')
     output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
-
-    seed = 0
 
     client = Text2ImageClient(model_id=model_id)
 
@@ -29,25 +28,20 @@ def generate(kwargs):
     elif scenario == "misleading":
         generate_misleading_text_to_image(model_id, task, client, seed, output_dir)
         return
-
-    # Adjusted path to read data from the correct directory
-    file_path = os.path.join('data/text-to-image/hallucination', scenario, f'{task}.csv')
-    data = pd.read_csv(file_path)
-    img_ids = data['img_id'].tolist()
-    prompts = data['prompt'].tolist()
-    
-
-
-
-
+    else:
+        # Adjusted path to read data from the correct directory
+        ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
+        data = ds[scenario].filter(lambda x: x['task'] == task)
+        img_ids = data['id'][:10]
+        prompts = data['prompt'][:10]
+        
     # Iterate over each prompt to generate images one by one
     for img_id, prompt in tqdm(zip(img_ids, prompts), desc=f"Generating images for {model_name}", total=len(prompts)):
         image_path = os.path.join(output_dir, f"{img_id}.jpg")
-        if not os.path.exists(image_path):
-            image = client.generate(prompt, seed=seed)
-            image.save(image_path)
-        else:
+        if os.path.exists(image_path):
             print(f"Image {img_id} already exists. Skipping generation.")
+        else:
+            image = client.generate(prompt, seed, image_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

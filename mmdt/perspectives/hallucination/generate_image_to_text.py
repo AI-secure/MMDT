@@ -15,13 +15,12 @@ from datasets import load_dataset
 def generate(kwargs):
 
     model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
-    model_name = model_id.split("/")[1] if '/' in model_id else model_id
+    model_name = model_id.replace('/', '_')
     # Adjusted path for output directory
     output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
     client = Image2TextClient(model_id=model_id)
     generation_configs = {'do_sample': False, 'max_new_tokens': 128}
-
 
     if scenario == "cooccurrence":
         generate_cooc_image_to_text(model_id, task, client, generation_configs, output_dir)
@@ -35,29 +34,23 @@ def generate(kwargs):
 
     response_file = os.path.join(output_dir, f'generation.csv')
 
-    
-    # Adjusted path to read data from the correct directory
-    # file_path = os.path.join('data/image-to-text/hallucination', scenario, f'{task}.csv')
-    # file = pd.read_csv(file_path)
     ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
-    scenario_subset = ds[scenario]
-    img_ids = scenario_subset['image']
-    prompts = scenario_subset['question']
-
-    #### TODO: Get the subset corresponding to the task
+    data = ds[scenario].filter(lambda x: x['task'] == task)
+    img_ids = data['id'][:10]
+    images = data['image'][:10]
+    prompts = data['question'][:10]
 
     responses = []
-
 
     if os.path.exists(response_file):
         print(f"Skipping generation as output file already exists: {response_file}")
         return
 
-
     for i in tqdm(range(len(img_ids))):
-
+        
+        img_id = img_ids[i]
         text = prompts[i]
-        image = scenario_subset['image'][i]
+        image = images[i]
 
         additional_instruction = get_instruction_by_task(task)
         text += additional_instruction
@@ -72,7 +65,7 @@ def generate(kwargs):
                 finally:
                     os.remove(tmp.name)
         
-        responses.append({'img_id': img_ids[i], 'response': response})
+        responses.append({'img_id': img_id, 'response': response})
         print(response)
 
     del client
