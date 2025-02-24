@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: ./hallucination_i2t.sh <model_id>
+# Usage: bash ./scripts/hallucination_i2t.sh <model_id>
 
 MODEL_ID=$1
 
