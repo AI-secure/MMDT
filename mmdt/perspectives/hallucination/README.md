@@ -90,7 +90,7 @@ Aggregated results:
             }
         },
         "text-to-image": {
-            "_scratch_czr_hf_models_stable-diffusion-2": {
+            "stabilityai/stable-diffusion-2": {
                 "cooccurrence": 0.2833333333333333,
                 "counterfactual": 0.16666666666666666,
                 "distraction": 0.5,
@@ -158,7 +158,7 @@ Breakdown results:
             }
         },
         "text-to-image": {
-            "_scratch_czr_hf_models_stable-diffusion-2": {
+            "stabilityai/stable-diffusion-2": {
                 "cooccurrence": {
                     "attribute": 0.5333333333333333,
                     "count": 0.0,
