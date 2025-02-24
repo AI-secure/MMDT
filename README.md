@@ -69,7 +69,7 @@ For example, the following script evaluates all scenarios and tasks of image-to-
 bash scripts/hallucination_i2t.sh gpt-4o
 ```
 
-An example of the output can be found [here]()
+An example of the output summarized score can be found [here](https://github.com/AI-secure/MMDT/blob/8acf05cd6b8b6bb769da1bc12d758a10a5aba84b/mmdt/perspectives/hallucination/README.md?plain=1#L70).
 
 ### Notes
 + Each of the six areas has its subdirectory containing the respective code and README.

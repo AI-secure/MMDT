@@ -43,8 +43,7 @@ def evaluate(kwargs):
 
     results = []
     for idx, current_data in tqdm(enumerate(data), desc=f"Evaluating with {model_id}", total=len(data)):
-        if idx > 5:
-            break
+
         img_id = current_data['id']
         path = os.path.join(output_dir, f"{img_id}.png")
         result = evaluate_task(client, current_data, img_id, path, task, generation_configs)

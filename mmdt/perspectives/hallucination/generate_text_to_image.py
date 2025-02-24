@@ -32,8 +32,8 @@ def generate(kwargs):
         # Adjusted path to read data from the correct directory
         ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")
         data = ds[scenario].filter(lambda x: x['task'] == task)
-        img_ids = data['id'][:10]
-        prompts = data['prompt'][:10]
+        img_ids = data['id']
+        prompts = data['prompt']
         
     # Iterate over each prompt to generate images one by one
     for img_id, prompt in tqdm(zip(img_ids, prompts), desc=f"Generating images for {model_name}", total=len(prompts)):

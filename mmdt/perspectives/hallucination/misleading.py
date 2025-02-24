@@ -29,8 +29,7 @@ def generate_misleading_image_to_text(model_id, task, client, generation_configs
             img.save(image_path)
             image_paths.append(image_path)
         
-    # total_number = len(question_array)
-    total_number = 10
+    total_number = len(question_array)
     for i in range(0, total_number):
         question = question_array[i]
         image_path = image_paths[i]
@@ -119,7 +118,7 @@ def generate_misleading_text_to_image(model_id, task, client, seed, output_dir):
             prompts.append(entry.get("prompt", ""))
             
     total_number = max(len(objects), len(attribute), len(number), len(relation_objects), len(spatial_relation), len(prompts))
-    total_number = 10
+
     image_dir = output_dir+"/images"
     os.makedirs(image_dir, exist_ok=True)
     num_generation = 1 if model_id in ["dall-e-2", "dall-e-3"] else 3

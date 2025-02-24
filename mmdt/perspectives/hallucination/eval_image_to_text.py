@@ -41,10 +41,10 @@ def evaluate(kwargs):
 
     
     ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
-    data = ds[scenario].filter(lambda x: x['task'] == task)[:10]
-    img_ids = data['id'][:10]
-    questions = data['question'][:10]
-    answers = data['answer'][:10]
+    data = ds[scenario].filter(lambda x: x['task'] == task)
+    img_ids = data['id']
+    questions = data['question']
+    answers = data['answer']
 
     model = LLMChat('gpt-4o')  # Initialize the model once per function call
     output_dir = os.path.join('results/image-to-text/hallucination', model_name, scenario, task)

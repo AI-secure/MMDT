@@ -24,7 +24,7 @@ def generate_ocr_image_to_text(model_id, task, client, generation_configs, outpu
             image_paths.append(image_path)
         
     total_number = len(question_array)
-    total_number = 10
+
     for i in range(0, total_number):
         question = question_array[i]
         image_path = image_paths[i]
@@ -106,7 +106,7 @@ def generate_ocr_text_to_image(model_id, task, client, seed, output_dir):
             data_id = entry.get("id", "")
         
     total_number = len(prompts)
-    total_number = 10
+
     image_dir = output_dir+"/images"
     os.makedirs(image_dir, exist_ok=True)
     num_generation = 1 if model_id in ["dall-e-2", "dall-e-3"] else 3
@@ -152,7 +152,7 @@ def evaluate_ocr_text_to_image(model_name, scenario, task):
         })
     hallucinated_number = 0
     results = []
-    for data in data_list[:10]:
+    for data in data_list:
         if data["image_path"] == "error":
             hallucinated_number += 1
             results.append({"id":data["id"],"detection_result":"No image","keyword":data["keyword"],"accuracy":0})

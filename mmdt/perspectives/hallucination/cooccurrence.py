@@ -43,7 +43,7 @@ def generate_cooc_text_to_image(model_id, task, client, seed, output_dir):
                 if obj["task"] == category:
                     data_source.append(obj)
 
-            data_source = data_source[:5]
+            data_source = data_source
             print(f"Processing {category} prompts")
 
             for i_idx, item in tqdm(enumerate(data_source), total=len(data_source)):
@@ -107,7 +107,7 @@ def generate_cooc_image_to_text(model_id, task, client, generation_configs, outp
                 if obj["task"] == category:
                     data_source.append(obj)
 
-            data_source = data_source[:5]
+            data_source = data_source
             print(f"Processing {category} prompts")
 
             for i_idx, item in tqdm(enumerate(data_source), total=len(data_source)):
@@ -365,7 +365,7 @@ def evaluate_cooc_text_to_image(model_name, scenario, task):
 
         for category in tqdm(all_category_list):
 
-            category_list = folder_dict[category][:10]
+            category_list = folder_dict[category]
 
 
             acc = 0

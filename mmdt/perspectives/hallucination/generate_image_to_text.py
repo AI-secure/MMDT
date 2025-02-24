@@ -36,9 +36,9 @@ def generate(kwargs):
 
     ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "hallucination")
     data = ds[scenario].filter(lambda x: x['task'] == task)
-    img_ids = data['id'][:10]
-    images = data['image'][:10]
-    prompts = data['question'][:10]
+    img_ids = data['id']
+    images = data['image']
+    prompts = data['question']
 
     responses = []
 

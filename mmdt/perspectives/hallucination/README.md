@@ -14,6 +14,12 @@ This directory contains scripts for generating and evaluating hallucinations in 
 
 ### Generating Results
 
+We provide an off-the-shelf script for evaluating the overall hallucination perspective on image-to-text and text-to-image modalities.
+```
+bash scripts/hallucination_i2t.sh <model_id>
+bash scripts/hallucination_t2i.sh <model_id>
+```
+
 To generate results, we recommend you use the main endpoint of MMDT, where you can specify the model, scenario, and task you want to execute. Here are the command-line arguments you need to provide:
 
 ```
