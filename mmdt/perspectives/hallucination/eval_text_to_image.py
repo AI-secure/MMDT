@@ -10,6 +10,7 @@ from mmdt.perspectives.hallucination.scenario_list import all_scenarios
 from mmdt.perspectives.hallucination.cooccurrence import evaluate_cooc_text_to_image
 from mmdt.perspectives.hallucination.ocr import evaluate_ocr_text_to_image
 from mmdt.perspectives.hallucination.misleading import evaluate_misleading_text_to_image
+from mmdt.perspectives.hallucination.spatial import evaluate_spatial_relationships
 from datasets import load_dataset
 
 def evaluate(kwargs):
@@ -37,17 +38,16 @@ def evaluate(kwargs):
     output_dir = os.path.join('results/text-to-image/hallucination', model_name, scenario, task)
     os.makedirs(output_dir, exist_ok=True)
 
-    # Initialize clients or detectors based on the task
-    # if task == 'attribute':
     client = Image2TextClient(model_id="llava-hf/llava-v1.6-mistral-7b-hf")
     generation_configs = {'do_sample': False, 'temperature': 0, 'max_new_tokens': 128}
 
     results = []
     for current_data in tqdm(data, desc=f"Evaluating with {model_id}"):
-        path = os.path.join(output_dir, f"{current_data['id']}.png")
-        result = evaluate_task(client, current_data, current_data['id'], path, task, generation_configs if 'generation_configs' in locals() else None)
+        img_id = current_data['id']
+        path = os.path.join(output_dir, f"{img_id}.png")
+        result = evaluate_task(client, current_data, img_id, path, task, generation_configs)
         results.append(result)
-
+        
     # Save the results to a CSV file
     df_results = pd.DataFrame(results)
     result_file = os.path.join(output_dir, 'evaluation.csv')
@@ -57,7 +57,7 @@ def evaluate_task(client, current_data, img_id, image_path, task, generation_con
     """ Evaluate a specific task based on the provided image and task type. """
     if task == 'attribute':
         question = current_data['checking_question']
-        response = client.generate(f"{question} Please provide the answer with 'Yes' or 'No'.", Image.open(image_path), **generation_configs)
+        response = client.generate(f"{question} Please provide the answer with 'Yes' or 'No'.", image_path, **generation_configs)
         accuracy = 1 if 'yes' in response.lower() else 0
         return {'img_id': img_id, 'response': response, 'accuracy': accuracy}
     elif task == 'spatial':
@@ -65,24 +65,6 @@ def evaluate_task(client, current_data, img_id, image_path, task, generation_con
         objects = eval(current_data['objects'])
         relations = (current_data['relations'])
         return evaluate_spatial_relationships(model, objects, relations, image_path)
-
-def evaluate_spatial_relationships(model, objects, relations, image_path):
-    """ Evaluate spatial relationships for an image based on detected objects. """
-    detection_result = model.detect_objects(image_path, objects)
-    bboxes = [detection_result[obj]['bbox'] for obj in objects if obj in detection_result]
-    
-    success_count = 0
-    for (obj_a, obj_b, expected_relation) in zip(objects[:-1], objects[1:], relations):
-        relation = determine_relative_position(bboxes[objects.index(obj_a)], bboxes[objects.index(obj_b)])
-        if relation == expected_relation:
-            success_count += 1
-
-    accuracy = success_count / len(relations) if relations else 0
-    return {
-        'img_id': image_path.split('/')[-1].split('.')[0],
-        'detected_relations': relations,
-        'accuracy': accuracy
-    }
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

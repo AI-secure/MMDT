@@ -37,7 +37,7 @@ def generate(kwargs):
         
     # Iterate over each prompt to generate images one by one
     for img_id, prompt in tqdm(zip(img_ids, prompts), desc=f"Generating images for {model_name}", total=len(prompts)):
-        image_path = os.path.join(output_dir, f"{img_id}.jpg")
+        image_path = os.path.join(output_dir, f"{img_id}.png")
         if os.path.exists(image_path):
             print(f"Image {img_id} already exists. Skipping generation.")
         else:
