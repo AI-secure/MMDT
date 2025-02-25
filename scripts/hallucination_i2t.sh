@@ -20,12 +20,17 @@ DEFAULT_TASKS=("identification" "attribute" "spatial" "count" "action")
 # Tasks only for the "ocr" scenario
 OCR_TASKS=("contradictory" "cooccur" "doc" "scene")
 
+COUNTERFACTUAL_TASKS=("identification" "attribute" "spatial" "count")
+
+
 # Loop over each scenario
 for scenario in "${SCENARIOS[@]}"; do
   
   # If the scenario is "ocr", use OCR_TASKS; otherwise, use DEFAULT_TASKS
   if [ "$scenario" == "ocr" ]; then
     tasks=("${OCR_TASKS[@]}")
+  elif [ "$scenario" == "counterfactual" ]; then
+    tasks=("${COUNTERFACTUAL_TASKS[@]}")
   else
     tasks=("${DEFAULT_TASKS[@]}")
   fi
