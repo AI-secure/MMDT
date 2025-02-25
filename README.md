@@ -1,5 +1,7 @@
 # MMDT: Decoding the Trustworthiness and Safety of Multimodal Foundation Models
 
+[[Website 🌐]](https://mmdecodingtrust.github.io/), [[Text-to-Image data 🤗]](https://huggingface.co/datasets/AI-Secure/MMDecodingTrust-T2I), [[Image-to-Text data 🤗]](https://huggingface.co/datasets/AI-Secure/MMDecodingTrust-I2T)
+
 ## Overview
 
 This repo contains the source code of MMDT (Multimodal DecodingTrust). This research endeavor is designed to help researchers and practitioners better understand the capabilities, limitations, and potential risks involved in deploying these state-of-the-art Multimodal foundation models (MMFMs). See our paper for details.
@@ -27,23 +29,19 @@ git clone https://github.com/AI-secure/MMDT.git && cd MMDT
 
 ### Install requirements
 
+Create a new environment:
+
 ```bash
 conda create --name mmdt python=3.9
 conda activate mmdt
+```
+
+Install PyTorch following [this link](https://pytorch.org/get-started/locally/). Then install the requirements:
+
+```bash
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
 ```
-
-### Load MMDT dataset
-
-```python
-from datasets import load_dataset
-
-ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "hallucination")  # Load Hallucination subset of Text-to-Image dataset
-
-ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "fairness")  # Load Fairness subset of Image-to-Text dataset
-```
-
-Please refer to our HF datasets for more details ([Text-to-Image](https://huggingface.co/datasets/AI-Secure/MMDecodingTrust-T2I), [Image-to-Text](https://huggingface.co/datasets/AI-Secure/MMDecodingTrust-I2T)).
 
 ### Evaluate all perspectives
 
@@ -72,7 +70,7 @@ bash scripts/hallucination_i2t.sh gpt-4o
 An example of the output summarized score can be found [here](./mmdt/perspectives/hallucination/README.md?plain=1#L76).
 
 ### Notes
-+ Each of the six areas has its subdirectory containing the respective code and README.
++ Each of the six perspectives has its subdirectory containing the respective code and README.
 
 + Follow the specific `README`: Every subdirectory has its own README. Refer to these documents for information on how to run the scripts and interpret the results.
 
