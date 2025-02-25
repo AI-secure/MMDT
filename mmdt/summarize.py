@@ -85,12 +85,25 @@ def get_hallucination_scores(result_dir="./results", breakdown=False):
             # 1) CSV scenarios
             if scenario_type in csv_scenarios:
                 if os.path.exists(csv_path):
-                    try:
-                        df = pd.read_csv(csv_path)
-                        score = df['accuracy'].mean()  # average of 'accuracy' column
-                    except Exception as e:
-                        print(f"Error reading CSV file {csv_path}: {e}")
-                        score = None
+                    if category == "image-to-text":
+                        try:
+                            df = pd.read_csv(csv_path)
+                            score = df['accuracy'].mean()  # average of 'accuracy' column
+                        except Exception as e:
+                            print(f"Error reading CSV file {csv_path}: {e}")
+                            score = None
+                    elif category == "text-to-image":
+                        try:
+                            df = pd.read_csv(csv_path)
+                            if task in ["identification", "count"]:
+                                score = df['soft_accuracy'].mean()  # average of 'soft_accuracy' for count and identification
+                            elif task in ["attribute", "spatial"]:
+                                score = df['strict_accuracy'].mean()  # average of 'strict_accuracy' for attribute and spatial
+                            else:
+                                raise ValueError(f"Unknown task: {task}")
+                        except Exception as e:
+                            print(f"Error reading CSV file {csv_path}: {e}")
+                            score = None
                 else:
                     score = None
 

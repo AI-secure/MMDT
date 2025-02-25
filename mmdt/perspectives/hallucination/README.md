@@ -80,23 +80,31 @@ Aggregated results:
     "fairness": null,
     "hallucination": {
         "image-to-text": {
+            "InternVL2-8B": {
+                "cooccurrence": 0.4076190476190476,
+                "counterfactual": 0.382,
+                "distraction": 0.5619999999999999,
+                "misleading": 0.782,
+                "natural": 0.186,
+                "ocr": 0.19399999999999998
+            },
             "llava-hf_llava-v1.6-mistral-7b-hf": {
-                "cooccurrence": 0.4,
-                "counterfactual": 0.24166666666666667,
-                "distraction": 0.5133333333333333,
-                "misleading": 0.6200000000000001,
-                "natural": 0.1,
-                "ocr": 0.024999999999999994
+                "cooccurrence": 0.39238095238095233,
+                "counterfactual": 0.19066666666666668,
+                "distraction": 0.45933333333333337,
+                "misleading": 0.608,
+                "natural": 0.11066666666666666,
+                "ocr": 0.096
             }
         },
         "text-to-image": {
-            "stabilityai/stable-diffusion-2": {
-                "cooccurrence": 0.2833333333333333,
-                "counterfactual": 0.16666666666666666,
-                "distraction": 0.5,
-                "misleading": 0.225,
-                "natural": 0.3333333333333333,
-                "ocr": 0.6666666666666667
+            "stable-diffusion-2": {
+                "cooccurrence": 0.2634436649754194,
+                "counterfactual": 0.14338333333333333,
+                "distraction": 0.3107047619047619,
+                "misleading": 0.2786666666666667,
+                "natural": 0.16740000000000002,
+                "ocr": 0.06333333333333332
             }
         }
     },
@@ -113,87 +121,128 @@ Breakdown results:
     "fairness": null,
     "hallucination": {
         "image-to-text": {
-            "llava-hf_llava-v1.6-mistral-7b-hf": {
+            "InternVL2-8B": {
                 "cooccurrence": {
-                    "action": 0.2,
-                    "attribute": 0.4,
-                    "count": 0.2,
-                    "identification": 0.6,
-                    "spatial": 0.6
+                    "action": 0.14285714285714285,
+                    "attribute": 0.42857142857142855,
+                    "count": 0.2857142857142857,
+                    "identification": 0.4666666666666667,
+                    "spatial": 0.7142857142857143
                 },
                 "counterfactual": {
-                    "action": null,
-                    "attribute": 0.1,
-                    "count": 0.5666666666666667,
-                    "identification": 0.3,
+                    "attribute": 0.184,
+                    "count": 0.608,
+                    "identification": 0.576,
+                    "spatial": 0.16
+                },
+                "distraction": {
+                    "action": 0.44,
+                    "attribute": 0.57,
+                    "count": 0.63,
+                    "identification": 0.71,
+                    "spatial": 0.46
+                },
+                "misleading": {
+                    "action": 0.5800000000000001,
+                    "attribute": 0.94,
+                    "count": 0.8200000000000001,
+                    "identification": 0.81,
+                    "spatial": 0.76
+                },
+                "natural": {
+                    "action": 0.07,
+                    "attribute": 0.07,
+                    "count": 0.5,
+                    "identification": 0.18,
+                    "spatial": 0.11
+                },
+                "ocr": {
+                    "contradictory": 0.256,
+                    "cooccur": 0.07199999999999995,
+                    "doc": 0.21599999999999997,
+                    "scene": 0.23199999999999998
+                }
+            },
+            "llava-hf_llava-v1.6-mistral-7b-hf": {
+                "cooccurrence": {
+                    "action": 0.2857142857142857,
+                    "attribute": 0.2857142857142857,
+                    "count": 0.14285714285714285,
+                    "identification": 0.5333333333333333,
+                    "spatial": 0.7142857142857143
+                },
+                "counterfactual": {
+                    "attribute": 0.04,
+                    "count": 0.6186666666666667,
+                    "identification": 0.104,
                     "spatial": 0.0
                 },
                 "distraction": {
-                    "action": 0.5,
-                    "attribute": 0.6,
-                    "count": 0.6666666666666666,
-                    "identification": 0.8,
+                    "action": 0.44,
+                    "attribute": 0.52,
+                    "count": 0.6266666666666667,
+                    "identification": 0.71,
                     "spatial": 0.0
                 },
                 "misleading": {
-                    "action": 0.5,
-                    "attribute": 0.8,
-                    "count": 0.19999999999999996,
-                    "identification": 0.8,
-                    "spatial": 0.8
+                    "action": 0.43999999999999995,
+                    "attribute": 0.81,
+                    "count": 0.38,
+                    "identification": 0.85,
+                    "spatial": 0.56
                 },
                 "natural": {
-                    "action": 0.0,
-                    "attribute": 0.0,
-                    "count": 0.39999999999999997,
-                    "identification": 0.1,
+                    "action": 0.06,
+                    "attribute": 0.01,
+                    "count": 0.41333333333333333,
+                    "identification": 0.07,
                     "spatial": 0.0
                 },
                 "ocr": {
-                    "contradictory": 0.0,
+                    "contradictory": 0.128,
                     "cooccur": 0.0,
-                    "doc": 0.09999999999999998,
-                    "scene": 0.0
+                    "doc": 0.09599999999999997,
+                    "scene": 0.16000000000000003
                 }
             }
         },
         "text-to-image": {
-            "stabilityai/stable-diffusion-2": {
+            "stable-diffusion-2": {
                 "cooccurrence": {
-                    "attribute": 0.5333333333333333,
+                    "attribute": 0.48549421152160877,
                     "count": 0.0,
-                    "identification": 0.3333333333333333,
-                    "spatial": 0.26666666666666666
+                    "identification": 0.3939885093822475,
+                    "spatial": 0.17429193899782133
                 },
                 "counterfactual": {
-                    "attribute": 0.16666666666666666,
-                    "count": null,
-                    "identification": null,
-                    "spatial": null
+                    "attribute": 0.048,
+                    "count": 0.15466666666666665,
+                    "identification": 0.36286666666666667,
+                    "spatial": 0.008
                 },
                 "distraction": {
-                    "attribute": 0.5,
-                    "count": null,
-                    "identification": null,
-                    "spatial": null
+                    "attribute": 0.504,
+                    "count": 0.19199999999999998,
+                    "identification": 0.5308190476190476,
+                    "spatial": 0.016
                 },
                 "misleading": {
-                    "attribute": 0.30000000000000004,
-                    "count": 0.0,
-                    "identification": 0.4666666666666667,
-                    "spatial": 0.1333333333333333
+                    "attribute": 0.45866666666666667,
+                    "count": 0.06666666666666665,
+                    "identification": 0.5173333333333333,
+                    "spatial": 0.07199999999999995
                 },
                 "natural": {
-                    "attribute": 0.3333333333333333,
-                    "count": null,
-                    "identification": null,
-                    "spatial": null
+                    "attribute": 0.216,
+                    "count": 0.11466666666666667,
+                    "identification": 0.3389333333333334,
+                    "spatial": 0.0
                 },
                 "ocr": {
-                    "complex": 0.6666666666666667,
-                    "contradictory": 0.6666666666666667,
-                    "distortion": 0.6666666666666667,
-                    "misleading": 0.6666666666666667
+                    "complex": 0.07466666666666666,
+                    "contradictory": 0.053333333333333344,
+                    "distortion": 0.06399999999999995,
+                    "misleading": 0.06133333333333335
                 }
             }
         }

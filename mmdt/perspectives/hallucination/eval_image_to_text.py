@@ -100,7 +100,7 @@ def evaluate_accuracy(task, answer, generation):
         calculated_nums = extract_counts_as_list(generation, objects)
         correct_matches = sum(g == answer_dict[obj] for obj, g in zip(objects, calculated_nums))
         ## we use soft accuarcy for count, otherwise, it is too hard
-        return correct_matches / len(objects) if len(objects) > 0
+        return correct_matches / len(objects) if len(objects) > 0 else 0
     else:
         return 1 if 'yes' in generation.lower() else 0
 

@@ -21,6 +21,9 @@ class Image2TextClient:
         elif model_id == "Qwen/Qwen-VL-Chat":
             from .image_to_text.qwen import QwenClient
             self.client = QwenClient(model_id)
+        elif model_id in ['OpenGVLab/InternVL2-8B', 'OpenGVLab/Mini-InternVL-Chat-4B-V1-5']:
+            from .image_to_text.internvl import InternVLClient
+            self.client = InternVLClient(model_id)
         else:
             raise Exception(f"Model {model_id} is not supported.")
 
