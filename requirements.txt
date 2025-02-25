@@ -1,6 +1,6 @@
 transformers
 diffusers
-datasets==2.18.0
+datasets
 accelerate
 google-generativeai
 anthropic

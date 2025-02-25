@@ -10,6 +10,7 @@ import time
 import random
 from glob import glob
 from PIL import Image
+import copy
 
 from mmdt.detection.image_detector_utils import ImageDetector, draw_bbox
 from mmdt.models import Text2ImageClient, Image2TextClient
@@ -28,8 +29,36 @@ seed = 20
 def evaluate_single_task(args):
     ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "adv", split=args.task)
     iter_ds = ds.to_iterable_dataset()
-    result_root_dir = os.path.join("./results/image_to_text", args.model_id, args.task)
+    result_root_dir = os.path.join("./results/image_to_text/adv", args.model_id, args.task)
 
+    # Define the paths for the CSV and statistic file.
+    test_csv = os.path.join(result_root_dir, "test_result.csv")
+    stat_result = os.path.join(result_root_dir, "statistic_result.txt")
+
+    # If test_result.csv exists, skip evaluation.
+    if os.path.exists(test_csv):
+        print(f"{test_csv} exists, skipping evaluation.")
+        # If statistic_result.txt doesn't exist, compute and write statistics.
+        if not os.path.exists(stat_result):
+            print("Calculating statistics from existing test_result.csv...")
+            df = pd.read_csv(test_csv)
+            df_valid = df[df["if_valid"] == True]
+            all_number = len(df_valid)
+            attack_success_number = len(df_valid[df_valid["attack_success"] == True])
+            robust_accurate_number = len(df_valid[df_valid["robust_accurate"] == True])
+            with open(stat_result, "w") as f:
+                results = f"Overall: {all_number}\n"
+                results += f"Robust accurate number: {robust_accurate_number}\n"
+                results += f"Robust accurate rate: {robust_accurate_number / all_number}\n"
+                results += f"Attack success number: {attack_success_number}\n"
+                results += f"Attack success rate: {attack_success_number / all_number}\n"
+                print(results)
+                f.write(results)
+        else:
+            print(f"{stat_result} exists, skipping statistics calculation.")
+        return
+
+    # Otherwise, proceed with evaluation.
     json_list = []
 
     if args.task == "object":
@@ -129,17 +158,16 @@ def evaluate_single_task(args):
                 "if_valid": if_valid
             })
 
-    # Save detailed results
+    os.makedirs(result_root_dir, exist_ok=True)
     df = pd.DataFrame(json_list)
-    df.to_csv(os.path.join(result_root_dir, "test_result.csv"), index=False)
+    df.to_csv(test_csv, index=False)
 
-    # Compute and write statistics on valid responses
     df_valid = df[df["if_valid"] == True]
     all_number = len(df_valid)
     attack_success_number = len(df_valid[df_valid["attack_success"] == True])
     robust_accurate_number = len(df_valid[df_valid["robust_accurate"] == True])
 
-    with open(os.path.join(result_root_dir, "statistic_result.txt"), "w") as f:
+    with open(stat_result, "w") as f:
         results = f"Overall: {all_number}\n"
         results += f"Robust accurate number: {robust_accurate_number}\n"
         results += f"Robust accurate rate: {robust_accurate_number / all_number}\n"
@@ -154,8 +182,9 @@ def evaluate(args):
     tasks = args.task if args.task != '' else 'object,attribute,spatial'
     tasks = [t.strip() for t in tasks.split(',')]
     for task in tasks:
-        args.task = task  # Update task for this iteration
-        evaluate_single_task(args)
+        temp_args = copy.deepcopy(args)
+        temp_args.task = task
+        evaluate_single_task(temp_args)
 
 
 if __name__ == "__main__":

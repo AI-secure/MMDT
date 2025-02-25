@@ -10,6 +10,7 @@ import time
 import random
 from glob import glob
 from PIL import Image
+import copy
 
 from mmdt.detection.image_detector_utils import ImageDetector, draw_bbox
 from mmdt.models import Text2ImageClient
@@ -44,7 +45,7 @@ def generate_single_task(args):
     ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "adv", split=args.task)
     iter_ds = ds.to_iterable_dataset()
 
-    result_root_dir = os.path.join("./results/text_to_image", args.model_id, args.task)
+    result_root_dir = os.path.join("./results/text_to_image/adv", args.model_id, args.task)
     os.makedirs(result_root_dir, exist_ok=True)
 
     image_dir = os.path.join(result_root_dir, "output_images")
@@ -65,12 +66,13 @@ def generate_single_task(args):
 
 def generate(args):
     # Allow multiple tasks if needed (comma-separated)
-    tasks = args.task if args.task != '' else 'object'
+    tasks = args.task if args.task != '' else 'object,attribute,spatial'
     tasks = [t.strip() for t in tasks.split(',')]
     args.image_number = 3  # set default value
     for task in tasks:
-        args.task = task  # Update the task for each iteration
-        generate_single_task(args)
+        temp_args = copy.deepcopy(args)
+        temp_args.task = task
+        generate_single_task(temp_args)
 
 
 if __name__ == "__main__":

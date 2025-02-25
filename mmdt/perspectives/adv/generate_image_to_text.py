@@ -10,6 +10,7 @@ import time
 import random
 from glob import glob
 from PIL import Image
+import copy
 
 from mmdt.detection.image_detector_utils import ImageDetector, draw_bbox
 from mmdt.models import Image2TextClient
@@ -32,7 +33,7 @@ def generate_response(client, text, image_path, save_path, dry_run=False):
         with open(save_path, "w") as f:
             f.write(response)
     else:
-        print(f"Response already exists. Skipping generation.")
+        # print(f"Response already exists. Skipping generation.")
         response = open(save_path, "r").read()
     return response
 
@@ -42,7 +43,7 @@ def generate_single_task(args):
     iter_ds = ds.to_iterable_dataset()
 
     temp_dir = './temp'
-    result_root_dir = os.path.join("./results/image_to_text", args.model_id, args.task)
+    result_root_dir = os.path.join("./results/image_to_text/adv", args.model_id, args.task)
     os.makedirs(result_root_dir, exist_ok=True)
 
     if args.task == "object" or args.task == "spatial":
@@ -96,7 +97,7 @@ def generate_single_task(args):
 
         # print(f"Response for image {index} generated")
 
-    print(f"Responses generated at {response_dir}")
+    # print(f"Responses generated at {response_dir}")
 
 
 def generate(args):
@@ -104,8 +105,9 @@ def generate(args):
     tasks = args.task if args.task != '' else 'object,attribute,spatial'
     tasks = [t.strip() for t in tasks.split(',')]
     for task in tasks:
-        args.task = task  # Update the task argument for each iteration
-        generate_single_task(args)
+        temp_args = copy.deepcopy(args)
+        temp_args.task = task
+        generate_single_task(temp_args)
 
 
 if __name__ == "__main__":

@@ -168,7 +168,77 @@ def get_privacy_scores(result_dir="./results", breakdown=False):
 
 
 def get_adv_scores(result_dir="./results", breakdown=False):
-    pass
+    """
+    Reads robust accurate rate scores for adv evaluation from two modalities:
+    image_to_text and text_to_image. The results are organized as:
+
+      {
+         "image_to_text": { model_id: score, ... },
+         "text_to_image": { model_id: score, ... }
+      }
+
+    Directory structure assumed:
+      result_dir/
+        image_to_text/
+          <model_id with potential subdirectories>/
+            object/ (statistic_result.txt)
+            attribute/ (statistic_result.txt)
+            spatial/ (statistic_result.txt)
+        text_to_image/
+          <model_id with potential subdirectories>/
+            object/ (statistic_result.txt)
+            attribute/ (statistic_result.txt)
+            spatial/ (statistic_result.txt)
+
+    When breakdown is True, returns a dict mapping each model_id to a dict of available task scores.
+    When breakdown is False:
+      - For each model, if all three tasks have a score, returns the aggregated average (a float).
+      - Otherwise, that model is omitted from the aggregated results.
+    """
+    import os
+
+    modalities = ["image_to_text", "text_to_image"]
+    tasks = ["object", "attribute", "spatial"]
+    results = {}
+
+    for modality in modalities:
+        modality_path = os.path.join(result_dir, modality, 'adv')
+        modality_scores = {}
+        if not os.path.exists(modality_path):
+            continue
+        # Use os.walk to traverse subdirectories (to handle model IDs with '/')
+        for root, dirs, files in os.walk(modality_path):
+            # Consider 'root' as a model directory if it directly contains at least one task folder.
+            if any(task in dirs for task in tasks):
+                # Compute model_id as the relative path from modality_path with "/" as separator.
+                model_id = os.path.relpath(root, modality_path).replace(os.sep, "/")
+                breakdown_avg = {}
+                for task in tasks:
+                    task_dir = os.path.join(root, task)
+                    stat_file = os.path.join(task_dir, "statistic_result.txt")
+                    if os.path.exists(stat_file):
+                        with open(stat_file, "r") as f:
+                            lines = f.readlines()
+                        rate = None
+                        for line in lines:
+                            if "Robust accurate rate:" in line:
+                                try:
+                                    rate_str = line.split("Robust accurate rate:")[1].strip()
+                                    rate = float(rate_str)
+                                except Exception as e:
+                                    print(f"Error parsing rate in {stat_file}: {e}")
+                                break
+                        if rate is not None:
+                            breakdown_avg[task] = rate
+                if breakdown:
+                    modality_scores[model_id] = breakdown_avg
+                else:
+                    # Only report an aggregated score if all three tasks are available.
+                    if len(breakdown_avg) == 3:
+                        aggregated = sum(breakdown_avg[task] for task in tasks) / 3
+                        modality_scores[model_id] = aggregated
+        results[modality] = modality_scores
+    return results
 
 
 def get_ood_scores(result_dir="./results", breakdown=False):
