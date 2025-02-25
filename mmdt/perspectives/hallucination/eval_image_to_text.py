@@ -57,15 +57,22 @@ def evaluate(kwargs):
         question = questions[i]
         answer = answers[i]
         response = responses[i]
-        prompt = get_prompt(task, question, answer, response)
-        generation = model(prompt)
+        if task == 'spatial':
+            accuracy = int(answer in response.lower())
+            results.append({
+                'img_id': img_id,
+                'accuracy': accuracy
+            })
+        else:
+            prompt = get_prompt(task, question, answer, response)
+            generation = model(prompt)
 
-        accuracy = evaluate_accuracy(task, answer, generation)
-        results.append({
-            'img_id': img_id,
-            'generation': generation,
-            'accuracy': accuracy
-        })
+            accuracy = evaluate_accuracy(task, answer, generation)
+            results.append({
+                'img_id': img_id,
+                'generation': generation,
+                'accuracy': accuracy
+            })
 
     # Save results for the current model in its specific directory
     df_results = pd.DataFrame(results)
@@ -92,7 +99,8 @@ def evaluate_accuracy(task, answer, generation):
         objects = list(answer_dict.keys())
         calculated_nums = extract_counts_as_list(generation, objects)
         correct_matches = sum(g == answer_dict[obj] for obj, g in zip(objects, calculated_nums))
-        return correct_matches / len(objects) if len(objects) > 0 else 0
+        ## we use soft accuarcy for count, otherwise, it is too hard
+        return correct_matches / len(objects) if len(objects) > 0
     else:
         return 1 if 'yes' in generation.lower() else 0
 
