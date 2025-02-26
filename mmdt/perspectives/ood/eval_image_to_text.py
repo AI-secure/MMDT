@@ -4,7 +4,7 @@ import re
 from tqdm import tqdm
 import argparse
 import json
-from utils import LLMChat
+from .utils import LLMChat
 from datasets import load_dataset
 
 # Constants and Initialization

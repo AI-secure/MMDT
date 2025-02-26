@@ -4,7 +4,7 @@ import os
 import sys
 import json
 import time
-from utils import check_relation, check_size, cal_acc, cal_spatial_acc, calclipscore_with_index
+from .utils import check_relation, check_size, cal_acc, cal_spatial_acc, calclipscore_with_index
 sys.path.append("../../../")
 from mmdt.models import Image2TextClient
 from mmdt.detection import ImageDetector

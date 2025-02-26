@@ -242,7 +242,177 @@ def get_adv_scores(result_dir="./results", breakdown=False):
 
 
 def get_ood_scores(result_dir="./results", breakdown=False):
-    pass
+    """
+    Reads OOD (Out of Distribution) scores for both text-to-image and image-to-text modalities.
+    
+    For text-to-image, evaluates:
+    - Shake scenarios (helpfulness, counting, spatial, attribute)
+    - Paraphrase/rare scenarios (helpfulness, counting, spatial, attribute)
+    
+    For image-to-text, evaluates:
+    - Corruption scenarios (object, counting, spatial, attribute)
+    - Transform scenarios (object, counting, spatial, attribute)
+    
+    Directory structure assumed:
+      result_dir/
+        text-to-image/ood/
+          <model_id>/
+            summary_0.json, summary_1.json, summary_2.json
+        image-to-text/ood/
+          <model_id>/
+            summary.json
+
+    When breakdown is True, returns per-subscenario scores.
+    When breakdown is False, returns the overall aggregated score.
+    """
+    def aggregate_t2i_scores(result_path):
+        """Internal function to aggregate text-to-image OOD scores"""
+        with open(os.path.join(result_path, "summary_0.json"), "r") as file:
+            results = json.load(file)
+        model_ids = list(results.keys())
+        results_scores = {}
+        results_subscenarios = {}
+        for model_id in model_ids:
+            results_shake = {"fidelity": 0, "counting": 0, "spatial": 0, "color": 0, "size": 0}
+            results_paraphrase = {"fidelity": 0, "counting": 0, "spatial": 0, "color": 0, "size": 0}
+            
+            # Average over 3 trials
+            for trial_id in [0, 1, 2]:
+                summary_path = os.path.join(result_path, f"summary_{trial_id}.json")
+                with open(summary_path, "r") as file:
+                    results = json.load(file)
+                
+                
+                # Accumulate scores for shake scenarios
+                results_shake["fidelity"] += results[model_id]['helpfulness']['Shake_']
+                results_shake["counting"] += results[model_id]['count']['Shake_']
+                results_shake["spatial"] += results[model_id]['spatial']['Shake_']
+                results_shake["color"] += results[model_id]['color']['Shake_']
+                results_shake["size"] += results[model_id]['size']['Shake_']
+                
+                # Accumulate scores for paraphrase scenarios
+                results_paraphrase["fidelity"] += results[model_id]['helpfulness']['Paraphrase_']
+                results_paraphrase["counting"] += results[model_id]['count']['Paraphrase_']
+                results_paraphrase["spatial"] += results[model_id]['spatial']['Paraphrase_']
+                results_paraphrase["color"] += results[model_id]['color']['Paraphrase_']
+                results_paraphrase["size"] += results[model_id]['size']['Paraphrase_']
+
+            # Average the accumulated scores
+            for key in results_shake:
+                results_shake[key] /= 3
+                results_paraphrase[key] /= 3
+            
+            # Convert fidelity scores to percentages
+            results_shake["fidelity"] *= 100
+            results_paraphrase["fidelity"] *= 100
+            
+            # Calculate attribute scores (average of color and size)
+            shake_attribute = (results_shake["color"] + results_shake["size"]) / 2
+            paraphrase_attribute = (results_paraphrase["color"] + results_paraphrase["size"]) / 2
+            
+            # Calculate final averages
+            avg_shake = (results_shake["fidelity"] + results_shake["counting"] + 
+                        results_shake["spatial"] + shake_attribute) / 4
+            avg_paraphrase = (results_paraphrase["fidelity"] + results_paraphrase["counting"] + 
+                            results_paraphrase["spatial"] + paraphrase_attribute) / 4
+            
+            results_scores[model_id] = (avg_shake + avg_paraphrase) / 2
+            results_subscenarios[model_id] = {
+                "helpfulness_shake": results_shake["fidelity"],
+                "counting_shake": results_shake["counting"],
+                "spatial_shake": results_shake["spatial"],
+                "attribute_shake": shake_attribute,
+                "helpfulness_rare": results_paraphrase["fidelity"],
+                "counting_rare": results_paraphrase["counting"],
+                "spatial_rare": results_paraphrase["spatial"],
+                "attribute_rare": paraphrase_attribute
+            }
+            
+        return {"score": results_scores, "subscenarios": results_subscenarios}
+
+    def aggregate_i2t_scores(result_path):
+        """Internal function to aggregate image-to-text OOD scores"""
+        transformations = ["Van_Gogh", "oil_painting", "watercolour_painting"]
+        corruptions = ["zoom_blur", "gaussian_noise", "pixelate"]
+        
+        summary_path = os.path.join(result_path, "summary.json")
+        with open(summary_path, "r") as file:
+            results = json.load(file)
+        model_ids = list(results.keys())
+        results_scores = {}
+        results_subscenarios = {}
+        for model_id in model_ids:
+        
+            # Calculate corruption scores
+            identification_corrupt = sum(results[model_id]['identification'][corrupt] for corrupt in corruptions) / 3
+            count_corrupt = sum(results[model_id]['count'][corrupt] for corrupt in corruptions) / 3
+            spatial_corrupt = sum(results[model_id]['spatial'][corrupt] for corrupt in corruptions) / 3
+            attribute_corrupt = sum(results[model_id]['attribute'][corrupt] for corrupt in corruptions) / 3
+            avg_corrupt = (identification_corrupt + count_corrupt + spatial_corrupt + attribute_corrupt) / 4
+            
+            # Calculate transformation scores
+            identification_transform = sum(results[model_id]['identification'][transform] for transform in transformations) / 3
+            count_transform = sum(results[model_id]['count'][transform] for transform in transformations) / 3
+            spatial_transform = sum(results[model_id]['spatial'][transform] for transform in transformations) / 3
+            attribute_transform = sum(results[model_id]['attribute'][transform] for transform in transformations) / 3
+            avg_transform = (identification_transform + count_transform + spatial_transform + attribute_transform) / 4
+            results_scores[model_id] = (avg_corrupt + avg_transform) / 2
+            results_subscenarios[model_id] = {
+                "object_corrupt": identification_corrupt,
+                "counting_corrupt": count_corrupt,
+                "spatial_corrupt": spatial_corrupt,
+                "attribute_corrupt": attribute_corrupt,
+                "object_transform": identification_transform,
+                "counting_transform": count_transform,
+                "spatial_transform": spatial_transform,
+                "attribute_transform": attribute_transform
+            }
+
+        return {"score": results_scores, "subscenarios": results_subscenarios}
+
+    modalities = {
+        "text-to-image": "text-to-image",
+        "image-to-text": "image-to-text"
+    }
+    results = {}
+
+    for modality_key, modality_path in modalities.items():
+        base_path = os.path.join(result_dir, modality_path, "ood")
+        modality_scores = {}
+        
+        if not os.path.exists(base_path):
+            continue
+
+        # Use os.walk to traverse subdirectories (to handle model IDs with '/')
+        for root, dirs, files in os.walk(base_path):
+            # For text-to-image, look for summary_0.json
+            # For image-to-text, look for summary.json
+            if modality_key == "text-to-image" and "summary_0.json" in files:
+                # try:
+                if True:
+                    scores = aggregate_t2i_scores(root)
+                    if breakdown:
+                        modality_scores = scores["subscenarios"]
+                    else:
+                        modality_scores = scores["score"]
+                # except Exception as e:
+                #     print(f"Error processing text-to-image OOD for {model_id}: {e}")
+                #     continue
+                    
+            elif modality_key == "image-to-text" and "summary.json" in files:
+                try:
+                    scores = aggregate_i2t_scores(root)
+                    if breakdown:
+                        modality_scores = scores["subscenarios"]
+                    else:
+                        modality_scores = scores["score"]
+                except Exception as e:
+                    print(f"Error processing image-to-text OOD for {model_id}: {e}")
+                    continue
+
+        results[modality_key] = modality_scores
+
+    return results
 
 
 def summarize_results(result_dir="./results"):
