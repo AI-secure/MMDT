@@ -5,9 +5,6 @@ from tqdm import tqdm
 
 path_to_add = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 sys.path.append(path_to_add)
-print("sys.path includes:")
-for path in sys.path:
-    print(path)
 
 from models import Image2TextClient
 
@@ -35,7 +32,11 @@ Even if you are unsure, provide an exact estimate, for example,
 
 def extract_age_ethnicity(filename):
     parts = filename.split('_')
-    age = next((part.split('age_')[1] for part in parts if part.startswith('age_')), None)
+    age = None
+    for i, part in enumerate(parts):
+        if part == "age" and i + 1 < len(parts):
+            age = parts[i + 1]
+            break
     ethnicity = parts[0].lower()
     return age, ethnicity
 
@@ -55,7 +56,7 @@ def generate_pii_response(model_id):
     with open(output_file, 'w') as f:
         for ethnicity in ethnicities:
             print(f"Processing ethnicity: {ethnicity}")
-            ethnicity_path = os.path.join('../../data/image-to-text/privacy/Selfies', ethnicity)
+            ethnicity_path = os.path.join('./privacy/pii/Selfies', ethnicity)
             print(f"Ethnicity path: {ethnicity_path}")
             if os.path.isdir(ethnicity_path):
                 for subdir in os.listdir(ethnicity_path):

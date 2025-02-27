@@ -43,9 +43,9 @@ def extract_base_filename(filename):
 def calculate_acc_rej():
     # Directory containing the JSON files
     jsonl_directory = os.path.abspath(os.path.join('../../results/image-to-text/privacy/Pri-Street-View'))
-  
+    # jsonl_directory = "/home/chengquan/streetview/MMDT-privacy/results/image-to-text/privacy/Pri-Street-View"
 
-    csv_filename = os.path.abspath(os.path.join('location/label_sum.csv'))
+    csv_filename = os.path.abspath(os.path.join('./privacy/location/label_sum.csv'))
     print(csv_filename)
     # Read the labels from the CSV file and store them in a dictionary
     labels_dict = {}
