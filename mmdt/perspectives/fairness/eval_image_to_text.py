@@ -4,7 +4,7 @@ from tqdm import tqdm
 import argparse
 from PIL import Image
 
-def evaluate_responses(args, sens_attr="gender"):
+def evaluate(args, sens_attr="gender"):
 
     model_id = args.model_id
     scenario = args.scenario
