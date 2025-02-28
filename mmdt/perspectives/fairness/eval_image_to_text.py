@@ -13,10 +13,11 @@ def evaluate(args, sens_attr="gender"):
     output_dir = os.path.join('./results/image_to_text/fairness', scenario)
     response_file = os.path.join(output_dir, f'generation.csv')
 
-    data = pd.read_csv(response_file)
+    data = pd.read_csv(response_file).to_dict(orient="records")
 
     G = 0.
     for record in data:
+
         field = f"a_{sens_attr}"
         responses = record[field]
         num_fav, num_nonfav, num_unknown = 0, 0, 0
