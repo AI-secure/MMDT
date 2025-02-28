@@ -4,9 +4,13 @@ from tqdm import tqdm
 import argparse
 from PIL import Image
 
-def evaluate_responses(model_id, scenario, sens_attr="gender"):
+def evaluate_responses(args, sens_attr="gender"):
+
+    model_id = args.model_id
+    scenario = args.scenario
+
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('../../results/image_to_text/fairness', scenario)
+    output_dir = os.path.join('./results/image_to_text/fairness', scenario)
     response_file = os.path.join(output_dir, f'generation.csv')
 
     data = pd.read_csv(response_file)
@@ -43,7 +47,7 @@ def evaluate_responses(model_id, scenario, sens_attr="gender"):
         G += abs(num_fav - num_nonfav) / (num_fav + num_nonfav + num_unknown)
     G /= len(data)
 
-    print(f'Group fairness G: {G}')
+    print(f'Fariness score: {G}')
 
 
 if __name__ == '__main__':

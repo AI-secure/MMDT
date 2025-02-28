@@ -3,17 +3,25 @@ import os
 import pandas as pd
 from tqdm import tqdm
 import argparse
-from prompt_manager import PromptManager
+from mmdt.perspectives.fairness.prompt_manager import PromptManager
 
 
-def generate(model_id, scenario, task):
+def generate(args):
+
+    model_id = args.model_id
+    scenario = args.scenario
+    num_images_per_prompt = 10
+    task = "attribute"
+
     # data loading
     prompt_manager = PromptManager(args.scenario)
     prompts = prompt_manager.get_prompt()
 
+
+
     # Define the output directory based on model name, scenario, and task
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
-    output_dir = os.path.join('../../results/text_to_image/fairness', scenario, task, model_name)
+    output_dir = os.path.join('./results/text_to_image/fairness', scenario, task, model_name)
     os.makedirs(output_dir, exist_ok=True)
 
     seed = 0
@@ -23,11 +31,12 @@ def generate(model_id, scenario, task):
     # Iterate over each prompt to generate images one by one
     for prompt in tqdm(prompts, desc=f"Generating images for {model_name}", total=len(prompts)):
         dir_path = os.path.join(output_dir, prompt)
-        for img_id in range(args.num_images_per_prompt):
+        os.makedirs(dir_path, exist_ok=True)
+        for img_id in range(num_images_per_prompt):
             image_path = os.path.join(dir_path, f'{img_id}.png')
             if not os.path.exists(image_path):
-                image = client.generate(prompt, seed=seed)
-                image.save(image_path)
+                image = client.generate(prompt, seed=seed, save_path=image_path)
+                # image.save(image_path)
             else:
                 print(f"Image {img_id} already exists. Skipping generation.")
 
@@ -41,4 +50,4 @@ if __name__ == '__main__':
     parser.add_argument('--num_images_per_prompt', type=int, default=10)
     args = parser.parse_args()
 
-    generate(args.model_id, args.scenario, args.task)
+    generate(args)

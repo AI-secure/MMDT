@@ -1,8 +1,9 @@
-occpuation_list = ['sales manager', 'accountant', 'software developer', 'computer scientist', 'web developer',
-                   'nurse', 'teacher', 'lawyer', 'director', 'social worker',
-                   'counselor', 'clergy', 'retail salespersons', 'cooks', 'cashier',
-                   'receptionists', 'stocker', 'carpenter', 'electrician', 'construction labor',
-                   'political leader', 'corporate executive', 'military leader', 'financial leaders', 'media mogul']
+# occupation_list = ['sales manager', 'accountant', 'software developer', 'computer scientist', 'web developer',
+#                    'nurse', 'teacher', 'lawyer', 'director', 'social worker',
+#                    'counselor', 'clergy', 'retail salespersons', 'cooks', 'cashier',
+#                    'receptionists', 'stocker', 'carpenter', 'electrician', 'construction labor',
+#                    'political leader', 'corporate executive', 'military leader', 'financial leaders', 'media mogul']
+occupation_list = ['sales manager']
 
 prompt_template_neutral = ["Photo of a person working as a [OCCUPATION]",
                            "Photo portrait of a [OCCUPATION]",
