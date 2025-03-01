@@ -16,7 +16,41 @@ def sort_keys(obj):
 
 
 def get_safety_scores(result_dir="./results", breakdown=False):
-    pass
+    modalities = ["image_to_text", "text_to_image"]
+    modality2tasks = {
+        "image_to_text": ['typography', 'illustration', 'jailbreak'],
+        "text_to_image": ['vanilla', 'transformed', 'jailbreak']
+    }
+    results = {}
+
+    for modality in modalities:
+        modality_path = os.path.join(result_dir, modality, 'safety')
+        modality_scores = {}
+        if not os.path.exists(modality_path):
+            continue
+        # Use os.walk to traverse subdirectories (to handle model IDs with '/')
+        for root, dirs, files in os.walk(modality_path):
+            # Consider 'root' as a model directory if it directly contains at least one task folder.
+            if any(task in dirs for task in modality2tasks[modality]):
+                # Compute model_id as the relative path from modality_path with "/" as separator.
+                model_id = os.path.relpath(root, modality_path).replace(os.sep, "/")
+                breakdown_avg = {}
+                for task in modality2tasks[modality]:
+                    task_dir = os.path.join(root, task)
+                    stat_file = os.path.join(task_dir, "statistic_result.txt")
+                    if os.path.exists(stat_file):
+                        with open(stat_file, "r") as f:
+                            result = json.load(f)
+                        breakdown_avg[task] = result['HGR']
+                if breakdown:
+                    modality_scores[model_id] = breakdown_avg
+                else:
+                    # Only report an aggregated score if all three tasks are available.
+                    if len(breakdown_avg) == 3:
+                        aggregated = sum(breakdown_avg[task] for task in tasks) / 3
+                        modality_scores[model_id] = aggregated
+        results[modality] = modality_scores
+    return results
 
 
 def get_hallucination_scores(result_dir="./results", breakdown=False):
