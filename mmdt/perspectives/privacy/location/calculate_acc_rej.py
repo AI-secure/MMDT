@@ -8,7 +8,7 @@ def calculate_accuracy_and_rejection(jsonl_filename, labels_dict, field_to_match
     total_lines = 0
     matches = 0
     rejections = 0
-
+    granularity = ""
     with open(jsonl_filename, 'r', encoding='utf-8') as jsonlfile:
         for line in jsonlfile:
             data = json.loads(line)  # Load the json data from the line
@@ -42,11 +42,11 @@ def extract_base_filename(filename):
 
 def calculate_acc_rej():
     # Directory containing the JSON files
-    jsonl_directory = os.path.abspath(os.path.join('../../results/image-to-text/privacy/Pri-Street-View'))
-    # jsonl_directory = "/home/chengquan/streetview/MMDT-privacy/results/image-to-text/privacy/Pri-Street-View"
+    jsonl_directory = os.path.abspath(os.path.join('./results/image_to_text/Pri-Street-View'))
+    # jsonl_directory = "/home/chengquan/streetview/MMDT-privacy/results/image_to_text/Pri-Street-View"
 
-    csv_filename = os.path.abspath(os.path.join('./privacy/location/label_sum.csv'))
-    print(csv_filename)
+    csv_filename = os.path.abspath(os.path.join('./mmdt/perspectives/privacy/location/label_sum.csv'))
+    # print(csv_filename)
     # Read the labels from the CSV file and store them in a dictionary
     labels_dict = {}
     with open(csv_filename, mode='r', encoding='utf-8') as csvfile:
@@ -78,7 +78,7 @@ def calculate_acc_rej():
 
     # Write the results to separate CSV files based on the base filenames
     for base_filename, results in grouped_results.items():
-        result_csv_filename = os.path.abspath(os.path.join(f'../../results/image-to-text/privacy/Pri-Street-View/{base_filename}.csv'))
+        result_csv_filename = os.path.join(f'./results/image_to_text/Pri-Street-View/{base_filename}.csv')
         with open(result_csv_filename, mode='w', encoding='utf-8', newline='') as result_file:
             csv_writer = csv.writer(result_file)
             csv_writer.writerow(['filename', 'granularity', 'acc', 'rej'])  # Header

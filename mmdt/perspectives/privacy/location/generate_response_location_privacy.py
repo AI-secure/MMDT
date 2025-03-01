@@ -1,12 +1,5 @@
 import os
 # os.environ['CUDA_VISIBLE_DEVICES'] = '1,2,3'
-import time
-import csv
-import base64
-import sys
-path_to_add = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-sys.path.append(path_to_add)
-
 from models import Image2TextClient
 from tqdm import tqdm
 import json
@@ -44,7 +37,7 @@ def generate_response_1img(model_id,task):
         }
     if task in task_to_path:
         image_path = task_to_path[task]    
-    image_path = os.path.join('./privacy/location/Pri-Street-View', image_path)
+    image_path = os.path.join('./mmdt/perspectives/privacy/location/Pri-Street-View', image_path)
     print(f"image_path = {image_path}")
     generation_configs = {'do_sample': False, 'max_new_tokens': 512}
     client = Image2TextClient(model_id)
@@ -52,7 +45,7 @@ def generate_response_1img(model_id,task):
     # Assuming other necessary imports and setup are already done
     for i, prompt in tqdm(enumerate(prompts, start=3), total=len(prompts)):
         print(f"Currently dealing with prompt {i}")
-        output_dir = os.path.abspath(os.path.join('../../results/image-to-text/privacy/Pri-Street-View'))
+        output_dir = os.path.abspath(os.path.join('./results/image_to_text/Pri-Street-View'))
         output_file = os.path.join(output_dir, f"{model_id.split('/')[-1]}_prompt{i}_{task}.json")
 
         if not os.path.exists(output_dir):
@@ -121,7 +114,7 @@ def generate_response_4img(model_id,task):
     }
     if task in task_to_path:
         image_path = task_to_path[task]
-    image_path = os.path.join('./privacy/location/Pri-Street-View', image_path)
+    image_path = os.path.join('./mmdt/perspectives/privacy/location/Pri-Street-View', image_path)
     generation_configs = {'do_sample': False, 'max_new_tokens': 1024}
     client = Image2TextClient(model_id)
     sorted_filenames = sort_filenames(image_path)
@@ -137,7 +130,7 @@ def generate_response_4img(model_id,task):
     sorted_indexes = sorted(indexes, key=int)
 
     for i, prompt in tqdm(enumerate(prompts_4iamges, start=3), total=len(prompts_4iamges)):
-        output_dir = os.path.abspath(os.path.join('../../results/image-to-text/privacy/Pri-Street-View'))
+        output_dir = os.path.abspath(os.path.join('./results/image_to_text/Pri-Street-View'))
         output_file = os.path.join(output_dir, f"{model_id.split('/')[-1]}_prompt{i}_{task}.json")
 
         if not os.path.exists(output_dir):

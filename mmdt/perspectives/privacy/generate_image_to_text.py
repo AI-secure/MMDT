@@ -1,18 +1,19 @@
 
 import argparse
+import os
+import sys
+path_to_add = os.path.abspath(os.path.join(os.path.dirname(__file__), "./"))
+sys.path.append(path_to_add)
 from location.generate_response_location_privacy import *
 from pii.generate_response_pii import generate_pii_response
 from PIL import Image
 from datasets import load_dataset
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model_id', type=str, required=True, help='Model ID to use for evaluation')
-    parser.add_argument('--scenario', type=str, default="location", help='Specify the scenario')
-    parser.add_argument('--task', type=str, default="Pri-SV-with-text", help='Specify the task to execute')
-    args = parser.parse_args()
-    dataset_dir = './privacy/location/Pri-Street-View'
-    if(args.scenario=="location"):
+
+def generate(kwargs):
+    model_id, scenario, task = kwargs.model_id, kwargs.scenario, kwargs.task
+    dataset_dir = './mmdt/perspectives/privacy/location/Pri-Street-View'
+    if(scenario=="location"):
         if not os.path.exists(dataset_dir):
             # Define task mapping to folder names
             task_to_path = {
@@ -40,7 +41,7 @@ if __name__ == '__main__':
                 filtered_length = len(filtered_ds) 
                 print(f"filtered_length = {filtered_length}")
                 # Create the directory if it doesn't exist
-                output_dir = os.path.join('./privacy/location/Pri-Street-View', folder_name)
+                output_dir = os.path.join('./mmdt/perspectives/privacy/location/Pri-Street-View', folder_name)
                 os.makedirs(output_dir, exist_ok=True)
 
                 # Save images for the current task
@@ -52,13 +53,13 @@ if __name__ == '__main__':
 
                 print(f"Saved {len(filtered_ds)} images to {output_dir}")
             
-        if args.task in ["Pri-4Loc-SV-with-text", "Pri-4Loc-SV-without-text"]:
-            generate_response_4img(args.model_id, args.task)
-        elif args.task in ["Pri-SV-with-text","Pri-SV-without-text"]:
-            generate_response_1img(args.model_id, args.task)
-    elif (args.scenario == "pii"):
+        if task in ["Pri-4Loc-SV-with-text", "Pri-4Loc-SV-without-text"]:
+            generate_response_4img(model_id, task)
+        elif task in ["Pri-SV-with-text","Pri-SV-without-text"]:
+            generate_response_1img(model_id, task)
+    elif (scenario == "pii"):
         ds = load_dataset("AI-Secure/MMDecodingTrust-I2T", "privacy", split="selfies")
-        dataset_dir = './privacy/pii/Selfies'
+        dataset_dir = './mmdt/perspectives/privacy/pii/Selfies'
         if not os.path.exists(dataset_dir):
             for row in ds:
                 ethnicity = row.get("ethnicity", "").strip().replace(" ", "_")
@@ -74,4 +75,4 @@ if __name__ == '__main__':
                 image.save(image_path)
                 print(f"Saved: {image_path}")
 
-        generate_pii_response(args.model_id)
+        generate_pii_response(model_id)

@@ -60,7 +60,7 @@ def calculate_metrics(jsonl_filename, labels_dict):
     return metrics
 
 def calculate_pii():
-    jsonl_directory = os.path.abspath(os.path.join('../../results/image-to-text/privacy/pii'))
+    jsonl_directory = os.path.abspath(os.path.join('./results/image_to_text/pii'))
 
     grouped_results = defaultdict(list)
     for filename in os.listdir(jsonl_directory):
@@ -71,7 +71,7 @@ def calculate_pii():
             grouped_results[base_filename].append((filename, metrics))
 
     for base_filename, results in grouped_results.items():
-        result_csv_filename = os.path.abspath(os.path.join(f'../../results/image-to-text/privacy/pii/{base_filename}_metrics.csv'))
+        result_csv_filename = os.path.abspath(os.path.join(f'./results/image_to_text/pii/{base_filename}_metrics.csv'))
         with open(result_csv_filename, mode='w', encoding='utf-8', newline='') as result_file:
             csv_writer = csv.writer(result_file)
             csv_writer.writerow(['filename', 'total_images', 'age_accuracy_exact', 'age_accuracy_within_3', 

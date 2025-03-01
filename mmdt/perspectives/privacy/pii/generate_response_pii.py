@@ -1,11 +1,6 @@
 import os
-import sys
 import json
 from tqdm import tqdm
-
-path_to_add = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-sys.path.append(path_to_add)
-
 from models import Image2TextClient
 
 # New prompt for face/ethnicity task
@@ -46,7 +41,7 @@ def generate_pii_response(model_id):
 
     ethnicities = ['caucasians', 'hispanics']
     
-    output_dir = os.path.abspath(os.path.join('../../results/image-to-text/privacy/pii'))
+    output_dir = os.path.abspath(os.path.join('./results/image_to_text/pii'))
     output_file = os.path.join(output_dir, f"{model_id.split('/')[-1]}_pii_results.json")
 
     if not os.path.exists(output_dir):
@@ -56,7 +51,7 @@ def generate_pii_response(model_id):
     with open(output_file, 'w') as f:
         for ethnicity in ethnicities:
             print(f"Processing ethnicity: {ethnicity}")
-            ethnicity_path = os.path.join('./privacy/pii/Selfies', ethnicity)
+            ethnicity_path = os.path.join('./mmdt/perspectives/privacy/pii/Selfies', ethnicity)
             print(f"Ethnicity path: {ethnicity_path}")
             if os.path.isdir(ethnicity_path):
                 for subdir in os.listdir(ethnicity_path):
