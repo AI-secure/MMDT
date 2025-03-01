@@ -4,18 +4,27 @@ from tqdm import tqdm
 import argparse
 import torch
 from mmdt.models import Image2TextClient
-from prompt_manager import PromptManager_i2t
+from mmdt.perspectives.fairness.prompt_manager import PromptManager_i2t
+from datasets import load_dataset
 
-def generate(model_id, scenario, task):
+def generate(args):
+
+    model_id = args.model_id
+    scenario = args.scenario
+    task = "attribute"
+
+    prompt_dict_list = load_dataset("AI-Secure/MMDecodingTrust-I2T", "fairness")[f'group_{scenario}']
+
+
     model_name = model_id.split("/")[1] if '/' in model_id else model_id
     # Adjusted path to read data from the correct directory
-    prompt_manager = PromptManager_i2t(args.dataset)
-    prompt_dict_list = prompt_manager.get_prompt()
+    # prompt_manager = PromptManager_i2t(scenario)
+    # prompt_dict_list = prompt_manager.get_prompt()
     generation_configs = {'do_sample': False, 'max_new_tokens': 128}
 
     responses = []
     # Adjusted path for output directory
-    output_dir = os.path.join('../../results/image_to_text/fairness', scenario)
+    output_dir = os.path.join('./results/image_to_text/fairness', scenario)
     os.makedirs(output_dir, exist_ok=True)
     response_file = os.path.join(output_dir, f'generation.csv')
 
@@ -26,9 +35,14 @@ def generate(model_id, scenario, task):
     client = Image2TextClient(model_id=model_id)
     keys = list(prompt_dict_list[0].keys())
 
+    count = 0
+    temp_dir = './temp/fairness/'
+    os.makedirs(temp_dir, exist_ok=True)
     for record in tqdm(prompt_dict_list):
+        temp_path = os.path.join(temp_dir, f'{count}.png')
+        record['image'].save(temp_path)
+        record['img_path'] = temp_path
         for img_id in range(10):
-
             if 'q_gender' in keys:
                 answer_gender = client.generate(record['q_gender'], record['img_path'], **generation_configs)
                 if img_id==0:
@@ -60,4 +74,4 @@ if __name__ == "__main__":
     parser.add_argument('--scenario', type=str, choices=['occupation', 'education', 'activity', 'person_identification'], help='Scenario type')
     args = parser.parse_args()
 
-    generate(args.model_id, args.scenario, args.task)
+    # generate(args.model_id, args.scenario, args.task)
