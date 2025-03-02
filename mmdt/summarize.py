@@ -549,7 +549,7 @@ def get_ood_scores(result_dir="./results", breakdown=False):
                     else:
                         modality_scores = scores["score"]
                 except Exception as e:
-                    print(f"Error processing image-to-text OOD for {model_id}: {e}")
+                    print(f"Error processing image-to-text OOD for: {e}")
                     continue
 
         results[modality_key] = modality_scores
