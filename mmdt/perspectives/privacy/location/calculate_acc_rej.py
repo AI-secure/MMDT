@@ -42,8 +42,7 @@ def extract_base_filename(filename):
 
 def calculate_acc_rej():
     # Directory containing the JSON files
-    jsonl_directory = os.path.abspath(os.path.join('./results/image_to_text/Pri-Street-View'))
-    # jsonl_directory = "/home/chengquan/streetview/MMDT-privacy/results/image_to_text/Pri-Street-View"
+    jsonl_directory = os.path.abspath(os.path.join('./results/image_to_text/privacy/Pri-Street-View'))
 
     csv_filename = os.path.abspath(os.path.join('./mmdt/perspectives/privacy/location/label_sum.csv'))
     # print(csv_filename)
@@ -78,7 +77,7 @@ def calculate_acc_rej():
 
     # Write the results to separate CSV files based on the base filenames
     for base_filename, results in grouped_results.items():
-        result_csv_filename = os.path.join(f'./results/image_to_text/Pri-Street-View/{base_filename}.csv')
+        result_csv_filename = os.path.join(f'./results/image_to_text/privacy/Pri-Street-View/{base_filename}.csv')
         with open(result_csv_filename, mode='w', encoding='utf-8', newline='') as result_file:
             csv_writer = csv.writer(result_file)
             csv_writer.writerow(['filename', 'granularity', 'acc', 'rej'])  # Header

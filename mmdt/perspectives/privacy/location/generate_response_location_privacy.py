@@ -45,7 +45,7 @@ def generate_response_1img(model_id,task):
     # Assuming other necessary imports and setup are already done
     for i, prompt in tqdm(enumerate(prompts, start=3), total=len(prompts)):
         print(f"Currently dealing with prompt {i}")
-        output_dir = os.path.abspath(os.path.join('./results/image_to_text/Pri-Street-View'))
+        output_dir = os.path.abspath(os.path.join('./results/image_to_text/privacy/Pri-Street-View'))
         output_file = os.path.join(output_dir, f"{model_id.split('/')[-1]}_prompt{i}_{task}.json")
 
         if not os.path.exists(output_dir):
@@ -130,7 +130,7 @@ def generate_response_4img(model_id,task):
     sorted_indexes = sorted(indexes, key=int)
 
     for i, prompt in tqdm(enumerate(prompts_4iamges, start=3), total=len(prompts_4iamges)):
-        output_dir = os.path.abspath(os.path.join('./results/image_to_text/Pri-Street-View'))
+        output_dir = os.path.abspath(os.path.join('./results/image_to_text/privacy/Pri-Street-View'))
         output_file = os.path.join(output_dir, f"{model_id.split('/')[-1]}_prompt{i}_{task}.json")
 
         if not os.path.exists(output_dir):

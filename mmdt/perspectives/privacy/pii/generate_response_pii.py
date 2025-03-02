@@ -41,7 +41,7 @@ def generate_pii_response(model_id):
 
     ethnicities = ['caucasians', 'hispanics']
     
-    output_dir = os.path.abspath(os.path.join('./results/image_to_text/pii'))
+    output_dir = os.path.abspath(os.path.join('./results/image_to_text/privacy/pii'))
     output_file = os.path.join(output_dir, f"{model_id.split('/')[-1]}_pii_results.json")
 
     if not os.path.exists(output_dir):
