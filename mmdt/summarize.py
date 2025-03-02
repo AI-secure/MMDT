@@ -218,7 +218,7 @@ def get_privacy_scores(result_dir="./results", breakdown=False):
             location/ (statistic_result.txt)
             pii/ (statistic_result.txt)
         text_to_image/
-          <model_id with potential subdirectories>/
+            privacy/laion_1k/<model_id>/evaluation_results.csv
 
 
     When breakdown is True, returns a dict mapping each model_id to a dict of available task scores.
@@ -226,14 +226,17 @@ def get_privacy_scores(result_dir="./results", breakdown=False):
       - For each model, if all the tasks have a score, returns the aggregated average (a float).
       - Otherwise, that model is omitted from the aggregated results.
     """
-    print("here1")
+
     results = {
         "image_to_text": {
             "pii": {},
             "location": {},
             "pii_and_location": {}
         },
-        "text_to_image": {}
+        "text_to_image": {
+            "laion_1k_cossim":{},
+            "laion_1k_l2dis":{},
+        }
     }
 
     # Process image_to_text modality
@@ -285,10 +288,18 @@ def get_privacy_scores(result_dir="./results", breakdown=False):
         
         results["image_to_text"]["pii_and_location"][model_id] = (results["image_to_text"]["pii"][model_id] + results["image_to_text"]["location"][model_id])/2
 
-    # Process text_to_image modality (placeholder, as per requirements)
+    # Process text_to_image modality
     if os.path.exists(os.path.join(result_dir, "text_to_image")):
-
-        pass
+        # Example folder structure:
+        #   ./results/<category>/privacy/<model>/<task>/evaluation_results.csv
+        laion_dir = os.path.join(result_dir, "text_to_image", "privacy", "laion_1k")
+        if os.path.exists(laion_dir):
+            for csv_file in glob(os.path.join(laion_dir, "**", "*.csv")):
+                model_id = csv_file.split("/")[-2]  # Extract model_id
+                df = pd.read_csv(csv_file)
+                if not df.empty:
+                    results["text_to_image"]["laion_1k_cossim"][model_id] = df["cossim"].mean()
+                    results["text_to_image"]["laion_1k_l2dis"][model_id] = df["l2dist"].mean()
 
     return results
 
