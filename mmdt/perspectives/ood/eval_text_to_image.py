@@ -56,49 +56,53 @@ def evaluate_single(args):
             continue
 
         if task == 'count':
-            result = GroundingDINO.single_detect(image_path, [obj["object"] for obj in results_dict[index]['objects']], box_threshold=0.4)
-            # print(result)
-            for i, items in enumerate(results_dict[index]['objects']):
-                obj = items["object"]
-                total_counts = result["entity_info"][obj]["total_count"]
-                results_dict[index]['objects'][i]["generated_objects"] = total_counts 
-                if int(total_counts) != int(items["counts"]):
-                    results_dict[index]['objects'][i]["answer"] = "Wrong"
-                else:
-                    results_dict[index]['objects'][i]["answer"] = "Correct"
+            if os.path.exists(image_path):
+                result = GroundingDINO.single_detect(image_path, [obj["object"] for obj in results_dict[index]['objects']], box_threshold=0.4)
+                # print(result)
+                for i, items in enumerate(results_dict[index]['objects']):
+                    obj = items["object"]
+                    total_counts = result["entity_info"][obj]["total_count"]
+                    results_dict[index]['objects'][i]["generated_objects"] = total_counts 
+                    if int(total_counts) != int(items["counts"]):
+                        results_dict[index]['objects'][i]["answer"] = "Wrong"
+                    else:
+                        results_dict[index]['objects'][i]["answer"] = "Correct"
 
         elif task == 'color':
             for i, items in enumerate(results_dict[index]['objects']):
-                response = client_llava.generate(f"Is the {items['object']} {items['color']}? Please provide the answer with 'Yes' or 'No'.", image_path, **generation_configs)
-                print(response)
-                if 'yes' in response.lower():
-                    results_dict[index]['objects'][i]["answer"] = "Correct"
-                else:
-                    results_dict[index]['objects'][i]["answer"] = "Wrong"
+                if os.path.exists(image_path):
+                    response = client_llava.generate(f"Is the {items['object']} {items['color']}? Please provide the answer with 'Yes' or 'No'.", image_path, **generation_configs)
+                    print(response)
+                    if 'yes' in response.lower():
+                        results_dict[index]['objects'][i]["answer"] = "Correct"
+                    else:
+                        results_dict[index]['objects'][i]["answer"] = "Wrong"
 
         elif task == 'size':
-            all_objects = [results_dict[index]['objects'][0]['object1']]
-            target_object = results_dict[index]['objects'][0]['object1']
-            compare_objects = [results_dict[index]['objects'][i]['object2'] for i in range(len(results_dict[index]['objects']))]
-            all_objects += compare_objects
-            sizes = [results_dict[index]['objects'][i]['size'] for i in range(len(results_dict[index]['objects']))]
-            result = GroundingDINO.single_detect(image_path, all_objects , box_threshold=0.55)
-            for i, size in enumerate(sizes):
-                if check_size(result, target_object, compare_objects[i], size) == False:     
-                    results_dict[index]['objects'][i]["answer"] = "Wrong"
-                else:
-                    results_dict[index]['objects'][i]["answer"] = "Correct"
+            if os.path.exists(image_path):
+                all_objects = [results_dict[index]['objects'][0]['object1']]
+                target_object = results_dict[index]['objects'][0]['object1']
+                compare_objects = [results_dict[index]['objects'][i]['object2'] for i in range(len(results_dict[index]['objects']))]
+                all_objects += compare_objects
+                sizes = [results_dict[index]['objects'][i]['size'] for i in range(len(results_dict[index]['objects']))]
+                result = GroundingDINO.single_detect(image_path, all_objects , box_threshold=0.55)
+                for i, size in enumerate(sizes):
+                    if check_size(result, target_object, compare_objects[i], size) == False:     
+                        results_dict[index]['objects'][i]["answer"] = "Wrong"
+                    else:
+                        results_dict[index]['objects'][i]["answer"] = "Correct"
 
         elif task == 'spatial':
-            all_objects = results_dict[index]['objects']['objs']
-            target_object = all_objects[0]
-            compare_objects = all_objects[1:]
-            relations = results_dict[index]['objects']['rel']
-            result = GroundingDINO.single_detect(image_path, all_objects, box_threshold=0.55)
-            if check_relation(result, target_object, compare_objects, relations) == False:
-                results_dict[index]['objects']['answer'] = "Wrong"
-            else:
-                results_dict[index]['objects']['answer'] = "Correct"
+            if os.path.exists(image_path):
+                all_objects = results_dict[index]['objects'][0]['objs']
+                target_object = all_objects[0]
+                compare_objects = all_objects[1:]
+                relations = results_dict[index]['objects'][0]['rel']
+                result = GroundingDINO.single_detect(image_path, all_objects, box_threshold=0.55)
+                if check_relation(result, target_object, compare_objects, relations) == False:
+                    results_dict[index]['objects'][0]['answer'] = "Wrong"
+                else:
+                    results_dict[index]['objects'][0]['answer'] = "Correct"
 
     valid_keys = [key for key in results_dict.keys() if "error" not in results_dict[key].keys()]
     if task == "helpfulness":
