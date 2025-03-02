@@ -156,9 +156,14 @@ def get_hallucination_scores(result_dir="./results", breakdown=False):
                     with open(json_path, 'r') as f:
                         data = json.load(f)
 
-                    # image-to-text: the JSON might look like {"action": 0.2, "high_cooc": 0.4, ...}
+                    # image-to-text: the JSON might look like {"high_cooc": 0.4, ...}
                     if category == "image-to-text":
-                        score = data.get(task, None)
+                        cooc_keys = ["high_cooc", "low_cooc", "historical_bias"]
+                        overall_vals = []
+                        score_all = 0
+                        for ck in cooc_keys:
+                            score_all += data.get(ck, None)
+                        score = score_all / len(cooc_keys)
 
                     elif category == "text-to-image":
                         cooc_keys = ["high_cooc", "low_cooc", "historical_bias"]
