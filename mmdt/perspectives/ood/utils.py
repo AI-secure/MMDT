@@ -241,9 +241,9 @@ def cal_spatial_acc(data):
         if "error" in sample:
             refusal += 1
             continue
-        if sample["objects"]["answer"] == "Wrong":
+        if "answer" in sample["objects"][0] and sample["objects"]["answer"] == "Wrong":
             continue
-        else:
+        elif "answer" in sample["objects"][0]::
             true_count += 1
     acc = 100 * (true_count / len(data.keys()))
     return acc
@@ -254,9 +254,9 @@ def cal_acc(data):
         if "error" in sample:
             continue
         for item_id, item in enumerate(sample["objects"]):
-            if item["answer"] == "Wrong":
+            if "answer" in item and item["answer"] == "Wrong":
                 break
-            elif item_id == len(sample["objects"]) - 1:
+            elif "answer" in item and item_id == len(sample["objects"]) - 1:
                 true_count += 1
     acc = 100 * (true_count / len(data.keys()))
     return acc
@@ -391,10 +391,15 @@ def clipeval_with_index(image_dir, target_prompts, index, device):
     image_paths = [os.path.join(image_dir, f"{i}.png") for i in index]
 
     print(image_paths[:5])
-
+    
     model, transform = clip.load("ViT-B/32", device=device, jit=False)
     model.eval()
-
+    nonexist_idx=[]
+    for i in range(len(image_paths)):
+        if os.path.exists(image_paths[i])==False:
+            nonexist_idx.append(i)
+    image_paths=[image_paths[x] for x in range(len(image_paths)) if x not in nonexist_idx]
+    target_prompts=[target_prompts[x] for x in range(len(target_prompts)) if x not in nonexist_idx]
     image_feats = extract_all_images(
         image_paths, model, device, batch_size=64, num_workers=8)
 
