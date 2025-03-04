@@ -229,6 +229,7 @@ def get_fairness_scores(result_dir="./results", breakdown=False):
         breakdown_results["text-to-image"][df["model"]]["age"] = abs(df["age"])
         breakdown_results["text-to-image"][df["model"]]["race"] = abs(df["white"]+df["black"])
         aggregated_results["text-to-image"][df["model"]] = 1./3 * (abs(df["gender"]) + abs(df["age"]) + abs(df["white"]+df["black"]))
+    # to add more
 
     return breakdown_results if breakdown else aggregated_results
 
