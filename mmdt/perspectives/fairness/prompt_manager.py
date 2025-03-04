@@ -120,3 +120,93 @@ class PromptManager_i2t:
                 entry = json.loads(line)
                 data.append(entry)
         return data
+
+
+if __name__ == "__main__":
+    prompt_list = []
+    prompt_fav = []
+    prompt_nonfav = []
+    for job in occupation_list:
+        for prompt_template in prompt_template_neutral:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+    for job in occupation_list:
+        for prompt_template in prompt_template_male:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+            prompt_fav.append(prompt_)
+        for prompt_template in prompt_template_female:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+            prompt_nonfav.append(prompt_)
+    for job in occupation_list:
+        for prompt_template in prompt_template_white:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+            prompt_fav.append(prompt_)
+        for prompt_template in prompt_template_black:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+            prompt_nonfav.append(prompt_)
+    for job in occupation_list:
+        for prompt_template in prompt_template_old:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+            prompt_fav.append(prompt_)
+        for prompt_template in prompt_template_young:
+            prompt_ = prompt_template.replace('[OCCUPATION]', job)
+            prompt_list.append(prompt_)
+            prompt_nonfav.append(prompt_)
+    for education in education_list:
+        for prompt_template in education_prompt_template_neutral:
+            prompt_ = prompt_template.replace('[EDUCATION]', education)
+            prompt_list.append(prompt_)
+    for education in education_list:
+        for prompt_template in education_prompt_template_male:
+            prompt_ = prompt_template.replace('[EDUCATION]', education)
+            prompt_list.append(prompt_)
+            prompt_fav.append(prompt_)
+        for prompt_template in education_prompt_template_female:
+            prompt_ = prompt_template.replace('[EDUCATION]', education)
+            prompt_list.append(prompt_)
+            prompt_nonfav.append(prompt_)
+    for education in education_list:
+        for prompt_template in education_prompt_template_white:
+            prompt_ = prompt_template.replace('[EDUCATION]', education)
+            prompt_list.append(prompt_)
+            prompt_fav.append(prompt_)
+        for prompt_template in education_prompt_template_black:
+            prompt_ = prompt_template.replace('[EDUCATION]', education)
+            prompt_list.append(prompt_)
+            prompt_nonfav.append(prompt_)
+    for activity in activity_list:
+        for prompt_template in activity_prompt_template_neutral:
+            prompt_ = prompt_template.replace('[ACTIVITY]', activity)
+            prompt_list.append(prompt_)
+
+    for activity in activity_list:
+        for prompt_template in activity_prompt_template_male:
+            prompt_ = prompt_template.replace('[ACTIVITY]', activity)
+            prompt_list.append(prompt_)
+            prompt_fav.append(prompt_)
+        for prompt_template in activity_prompt_template_female:
+            prompt_ = prompt_template.replace('[ACTIVITY]', activity)
+            prompt_list.append(prompt_)
+            prompt_nonfav.append(prompt_)
+
+    print(len(prompt_list))
+
+    data = []
+    for prompt in prompt_list:
+        data.append({"fairness": "individual_fairness", "prompt": prompt})
+
+    with open('./data/text-to-image/individual_fairness.jsonl', "w", encoding="utf-8") as f:
+        for item in data:
+            f.write(json.dumps(item) + "\n")
+
+
+
+
+
+
+

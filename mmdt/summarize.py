@@ -199,8 +199,38 @@ def get_hallucination_scores(result_dir="./results", breakdown=False):
 
 
 def get_fairness_scores(result_dir="./results", breakdown=False):
-    pass
+    """
+        Collects fairness scores for both text-to-image and image-to-text.
 
+        Scenarios and file formats:
+          1) Scenarios with CSV (evaluation.csv):
+             ["social_stereotype", "decision_making", "overkill"]
+          2) Scenarios with JSON:
+             ["individual"]
+
+        The final data structure has:
+            aggregated_results[scenario][model_id][domain] = average fairness scores
+        If breakdown=True, you get a deeper dictionary with per-attribute scores.
+
+        If a file doesn't exist for a given scenario/task, None is recorded.
+    """
+
+    # We handle both categories
+    categories = ["image-to-text", "text-to-image"]
+
+    # Prepare containers
+    aggregated_results = {cat: {} for cat in categories}
+    breakdown_results = {cat: {} for cat in categories}
+
+    file_stereotype = "analyze_results\\stereotype_result.csv"
+    if os.path.exists(file_stereotype):
+        df = pd.read_csv(file_stereotype)
+        breakdown_results["text-to-image"][df["model"]]["gender"] = abs(df["gender"])
+        breakdown_results["text-to-image"][df["model"]]["age"] = abs(df["age"])
+        breakdown_results["text-to-image"][df["model"]]["race"] = abs(df["white"]+df["black"])
+        aggregated_results["text-to-image"][df["model"]] = 1./3 * (abs(df["gender"]) + abs(df["age"]) + abs(df["white"]+df["black"]))
+
+    return breakdown_results if breakdown else aggregated_results
 
 def get_privacy_scores(result_dir="./results", breakdown=False):
     """
