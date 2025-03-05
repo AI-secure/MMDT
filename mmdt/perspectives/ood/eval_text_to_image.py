@@ -19,6 +19,11 @@ num_exp = 3
 
 
 def evaluate(args):
+    if not os.path.exists('./mmdt/detection/GroundingDINO/weights'):
+        os.makedirs('./mmdt/detection/GroundingDINO/weights')
+    if not os.path.exists('./mmdt/detection/GroundingDINO/weights/groundingdino_swinb_cogcoor.pth'):
+        os.system('wget -q https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha2/groundingdino_swinb_cogcoor.pth -O ./mmdt/detection/GroundingDINO/weights/groundingdino_swinb_cogcoor.pth')
+
     for exp_id in range(num_exp):
         args.exp_id = exp_id
         evaluate_single(args)

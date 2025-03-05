@@ -1,7 +1,7 @@
 #!/bin/bash
 
 modality="text_to_image"
-model_id="dall-e-2"
+model_id=$1  # e.g., stabilityai/stable-diffusion-2
 perspective="safety"
 scenarios=("vanilla" "transformed" "jailbreak")
 

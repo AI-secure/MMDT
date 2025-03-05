@@ -15,5 +15,5 @@ task="Pri-SV-with-text" # "Pri-SV-with-text", "Pri-SV-without-text", "Pri-4Loc-S
 python mmdt/main.py --modality ${modality} --model_id ${model_id} --perspectives ${perspective} --scenario $scenario --task ${task}
 
 # for pii
-# scenario="pii"
-# python mmdt/main.py --modality ${modality} --model_id ${model_id} --perspectives ${perspective} --scenario $scenario
+scenario="pii"
+python mmdt/main.py --modality ${modality} --model_id ${model_id} --perspectives ${perspective} --scenario $scenario

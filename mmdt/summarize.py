@@ -47,7 +47,7 @@ def get_safety_scores(result_dir="./results", breakdown=False):
                 else:
                     # Only report an aggregated score if all three tasks are available.
                     if len(breakdown_avg) == 3:
-                        aggregated = sum(breakdown_avg[task] for task in tasks) / 3
+                        aggregated = sum(breakdown_avg[task] for task in modality2tasks[modality]) / 3
                         modality_scores[model_id] = aggregated
         results[modality] = modality_scores
     return results
@@ -561,16 +561,17 @@ def get_ood_scores(result_dir="./results", breakdown=False):
             # For text-to-image, look for summary_0.json
             # For image-to-text, look for summary.json
             if modality_key == "text-to-image" and "summary_0.json" in files:
-                # try:
-                if True:
+                try:
                     scores = aggregate_t2i_scores(root)
                     if breakdown:
                         modality_scores = scores["subscenarios"]
                     else:
                         modality_scores = scores["score"]
-                # except Exception as e:
-                #     print(f"Error processing text-to-image OOD for {model_id}: {e}")
-                #     continue
+                except Exception as e:
+                    print(f"Error processing text-to-image OOD: {e}")
+                    scores = {}
+                    modality_scores = {}
+                    continue
                     
             elif modality_key == "image-to-text" and "summary.json" in files:
                 try:
@@ -580,7 +581,9 @@ def get_ood_scores(result_dir="./results", breakdown=False):
                     else:
                         modality_scores = scores["score"]
                 except Exception as e:
-                    print(f"Error processing image-to-text OOD for: {e}")
+                    print(f"Error processing image-to-text OOD: {e}")
+                    scores = {}
+                    modality_scores = {}
                     continue
 
         results[modality_key] = modality_scores

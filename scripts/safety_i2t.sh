@@ -1,7 +1,7 @@
 #!/bin/bash
 
 modality="image_to_text"
-model_id="llava-hf/llava-v1.6-mistral-7b-hf"
+model_id=$1  # e.g., llava-hf/llava-v1.6-vicuna-7b-hf
 perspective="safety"
 scenarios=("typography" "illustration" "jailbreak")
 

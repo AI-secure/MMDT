@@ -6,6 +6,6 @@ perspective="privacy"
 task="laion_1k" 
 
 # enable dry_run to test environment
-python mmdt/main.py --modality ${modality} --model_id ${model_id} --perspectives ${perspective} --task $task --dry_run
+#python mmdt/main.py --modality ${modality} --model_id ${model_id} --perspectives ${perspective} --task $task --dry_run
 # actual run 
 python mmdt/main.py --modality ${modality} --model_id ${model_id} --perspectives ${perspective} --task $task 
