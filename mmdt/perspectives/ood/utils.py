@@ -243,7 +243,7 @@ def cal_spatial_acc(data):
             continue
         if "answer" in sample["objects"][0] and sample["objects"]["answer"] == "Wrong":
             continue
-        elif "answer" in sample["objects"][0]::
+        elif "answer" in sample["objects"][0]:
             true_count += 1
     acc = 100 * (true_count / len(data.keys()))
     return acc

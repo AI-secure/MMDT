@@ -46,12 +46,20 @@ python -m spacy download en_core_web_sm
 ### Evaluate all perspectives
 
 ```bash
-python mmdt/main.py --model_id {model_id}
+bash scripts/t2i.sh {model_id}  # Evaluate a text-to-image model
+bash scripts/i2t.sh {model_id}  # Evaluate an image-to-text model
 ```
 
 ### Evaluate each perspective
 
-Specifically, you can evaluate your model on specific perspective, scenario, and task by running the following script:
+We also provide off-the-shelf scripts for evaluating each perspective under `./scripts`.
+For example, the following script evaluates all scenarios and tasks of image-to-text modality for the hallucination perspective.
+```bash
+bash scripts/hallucination_i2t.sh gpt-4o
+```
+An example of the output summarized score can be found [here](./mmdt/perspectives/hallucination/README.md?plain=1#L76).
+
+Moreover, you can customize the evaluation process with specific perspective, scenario, and task by running the following script:
 ```
 python mmdt/main.py --modality {modality} --model_id {model_id} --perspectives {perspective} --scenario {scenario} --task {task}
 ```
@@ -61,13 +69,161 @@ For example, to evaluate `gpt-4o` on hallucination under `natural selection` sce
 python mmdt/main.py --modality image_to_text --model_id gpt-4o --perspectives hallucination --scenario natural --task action
 ```
 
-Moreover, we also provide off-the-shelf scripts for evaluating each perspective under `./scripts`.
-For example, the following script evaluates all scenarios and tasks of image-to-text modality for the hallucination perspective.
-```bash
-bash scripts/hallucination_i2t.sh gpt-4o
+Our framework includes the following perspectives, scenarios, and tasks:
+```
+Text-to-image models
+├── safety
+│   ├── vanilla
+│   ├── transformed
+│   └── jailbreak
+├── hallucination
+│   ├── natural
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   └── count
+│   ├── counterfactual
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   └── count
+│   ├── misleading
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   └── count
+│   ├── distraction
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   └── count
+│   ├── ocr
+│   │   ├── complex
+│   │   ├── contradictory
+│   │   ├── distortion
+│   │   └── misleading
+│   └── cooccurrence
+│       ├── identification
+│       ├── attribute
+│       ├── spatial
+│       └── count
+├── fairness
+│   ├── social_stereotype
+│   ├── decision_making
+│   ├── overkill
+│   └── individual
+├── privacy
+│   └── training
+│       └── laion_1k
+├── adv
+│   └── adv
+│       ├── object
+│       ├── attribute
+│       └── spatial
+└── ood
+    ├── Shake_
+    │   ├── helpfulness
+    │   ├── count
+    │   ├── spatial
+    │   ├── color
+    │   └── size
+    └── Paraphrase_
+        ├── helpfulness
+        ├── count
+        ├── spatial
+        ├── color
+        └── size
+
+Image-to-text models
+├── safety
+│   ├── typography
+│   ├── illustration
+│   └── jailbreak
+├── hallucination
+│   ├── natural
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   ├── count
+│   │   └── action
+│   ├── counterfactual
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   └── count
+│   ├── misleading
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   ├── count
+│   │   └── action
+│   ├── distraction
+│   │   ├── identification
+│   │   ├── attribute
+│   │   ├── spatial
+│   │   ├── count
+│   │   └── action
+│   ├── ocr
+│   │   ├── contradictory
+│   │   ├── cooccur
+│   │   ├── doc
+│   │   └── scene
+│   └── cooccurrence
+│       ├── identification
+│       ├── attribute
+│       ├── spatial
+│       ├── count
+│       └── action
+├── fairness
+│   ├── occupation
+│   ├── education
+│   ├── activity
+│   └── person_identification
+├── privacy
+│   ├── location
+│   │   ├── Pri-SV-with-text
+│   │   ├── Pri-SV-without-text
+│   │   ├── Pri-4Loc-SV-with-text
+│   │   └── Pri-4Loc-SV-without-text
+│   └── pii
+├── adv
+│   └── adv
+│       ├── object
+│       ├── attribute
+│       └── spatial
+└── ood
+    ├── Van_Gogh
+    │   ├── attribute
+    │   ├── count
+    │   ├── spatial
+    │   └── identification
+    ├── oil_painting
+    │   ├── attribute
+    │   ├── count
+    │   ├── spatial
+    │   └── identification
+    ├── watercolour_painting
+    │   ├── attribute
+    │   ├── count
+    │   ├── spatial
+    │   └── identification
+    ├── gaussian_noise
+    │   ├── attribute
+    │   ├── count
+    │   ├── spatial
+    │   └── identification
+    ├── zoom_blur
+    │   ├── attribute
+    │   ├── count
+    │   ├── spatial
+    │   └── identification
+    └── pixelate
+        ├── attribute
+        ├── count
+        ├── spatial
+        └── identification
 ```
 
-An example of the output summarized score can be found [here](./mmdt/perspectives/hallucination/README.md?plain=1#L76).
 
 ### Notes
 + Each of the six perspectives has its subdirectory containing the respective code and README.

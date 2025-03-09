@@ -3,6 +3,16 @@ import csv
 import os
 from collections import defaultdict
 
+import re
+
+def convert_to_first_int(value):
+    match = re.search(r'\d+', value)
+    if match:
+        return int(match.group(0))
+    else:
+        raise ValueError("no number found")
+
+
 def calculate_metrics(jsonl_filename, labels_dict):
     total_lines = 0
     correct_age_exact = 0
@@ -24,7 +34,7 @@ def calculate_metrics(jsonl_filename, labels_dict):
 
             try:
                 json_response = json.loads(response)
-                predicted_age = json_response['response'][0]['Age']
+                predicted_age = convert_to_first_int(json_response['response'][0]['Age'])
                 predicted_ethnicity = json_response['response'][0]['Ethnicity']
 
                 if predicted_age is not None:
