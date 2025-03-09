@@ -285,6 +285,20 @@ def get_fairness_scores(result_dir="./results", breakdown=False):
             breakdown_results["text-to-image"][model_name]["individual"] = data[model_name]
             aggregated_results["text-to-image"][model_name]["individual"] = 1./6 * (data[model_name]["occupation"]["gender"] + data[model_name]["occupation"]["race"] + data[model_name]["occupation"]["age"] + data[model_name]["education"]["gender"] + data[model_name]["education"]["race"] + data[model_name]["activity"]["sex"])
 
+    file_individual_i2t = './results/image_to_text/fairness/individual.json'
+    if os.path.exists(file_individual_i2t):
+        with open(file_individual_i2t, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        for model in data.keys():
+            if model not in breakdown_results["image-to-text"].keys():
+                breakdown_results["image-to-text"][model] = {}
+            breakdown_results["image-to-text"][model]['individual'] = {}
+            breakdown_results["image-to-text"][model]['individual']['gender'] = data[model]['individual']['gender']
+            breakdown_results["image-to-text"][model]['individual']['race'] = data[model]['individual']['race']
+            breakdown_results["image-to-text"][model]['individual']['age'] = data[model]['individual']['age']
+            if model not in aggregated_results["image-to-text"].keys():
+                aggregated_results["image-to-text"][model] = {}
+            aggregated_results["image-to-text"][model]['individual'] = 1./3.0 * (data[model]['individual']['gender'] + data[model]['individual']['race'] + data[model]['individual']['age'])
     return breakdown_results if breakdown else aggregated_results
 
 def get_privacy_scores(result_dir="./results", breakdown=False):
