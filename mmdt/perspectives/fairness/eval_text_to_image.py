@@ -20,6 +20,7 @@ def save_json(data, file_path, indent=4):
     """Saves JSON data to a file."""
     with open(file_path, 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=indent)  # Write JSON with pretty formatting
+    print(f'Save at {file_path}')
 
 
 def eval_stereotype(args, result_path):
@@ -35,7 +36,7 @@ def eval_decision_making(args, result_path):
 
 def eval_overkill(args, result_path):
     model_name = args.model_id.split("/")[1] if '/' in args.model_id else args.model_id
-    eval_(model_name, 'factual_accuracy')
+    eval_(model_name, 'overkill')
     factual()
 
 def get_clip_score(model, preprocess, tokenizer, image_path, text, device):
@@ -160,6 +161,10 @@ def eval_individual(args, result_path):
     eval_results[model_id] = {}
     domains = ["occupation", "education", "activity"]
 
+    clipmodel, preprocess, tokenizer = open_clip.create_model_and_transforms('ViT-B/32', pretrained='openai',
+                                                                             device=f'cuda:{evaluate_gpu_id}')
+    evaluation_model = VQA_evaluation('instruct_blip', "", device=f'cuda:{evaluate_gpu_id2}')
+
     for domain in domains:
         eval_results[model_id][domain] = {}
 
@@ -167,9 +172,6 @@ def eval_individual(args, result_path):
         model_name = model_id.split("/")[1] if '/' in model_id else model_id
         image_dir = os.path.join('./results/text_to_image/fairness', scenario, model_name)
 
-        clipmodel, preprocess, tokenizer = open_clip.create_model_and_transforms('ViT-B/32', pretrained='openai',
-                                                                                 device=f'cuda:{evaluate_gpu_id}')
-        evaluation_model = VQA_evaluation('instruct_blip', domain, device=f'cuda:{evaluate_gpu_id2}')
 
 
         if domain == "occupation":
@@ -180,6 +182,34 @@ def eval_individual(args, result_path):
                     data_name = f'{domain}_with_race'
                 elif sens == 'age':
                     data_name = f'{domain}_with_age'
+
+                prompt_neu = PromptManager(domain).get_prompt()
+                prompt_fav = PromptManager(data_name).get_prompt(get_fav_only=True)
+                prompt_nonfav = PromptManager(data_name).get_prompt(get_nonfav_only=True)
+
+                indi = compute_dif(prompt_neu, prompt_fav, prompt_nonfav, image_dir, evaluation_model, clipmodel, preprocess, tokenizer, evaluate_gpu_id)
+
+                eval_results[model_id][domain][sens] = indi
+        elif domain == "education":
+            for sens in ["gender", "race"]:
+                if sens == 'gender':
+                    data_name = f'{domain}_with_sex'
+                elif sens == 'race':
+                    data_name = f'{domain}_with_race'
+
+                prompt_neu = PromptManager(domain).get_prompt()
+                prompt_fav = PromptManager(data_name).get_prompt(get_fav_only=True)
+                prompt_nonfav = PromptManager(data_name).get_prompt(get_nonfav_only=True)
+
+                indi = compute_dif(prompt_neu, prompt_fav, prompt_nonfav, image_dir, evaluation_model, clipmodel, preprocess, tokenizer, evaluate_gpu_id)
+
+                eval_results[model_id][domain][sens] = indi
+        elif domain == "activity":
+            for sens in ["sex"]:
+                if sens == 'gender':
+                    data_name = f'{domain}_with_sex'
+                elif sens == 'race':
+                    data_name = f'{domain}_with_race'
 
                 prompt_neu = PromptManager(domain).get_prompt()
                 prompt_fav = PromptManager(data_name).get_prompt(get_fav_only=True)

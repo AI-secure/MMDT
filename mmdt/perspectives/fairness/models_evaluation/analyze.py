@@ -115,7 +115,7 @@ def stereotype (): ####model responses for text-to-image
 				age_score=None
 				
 			result.loc[len(result.index)]=[model, domain, gender_score]+ race4_score+[age_score]
-	result.to_csv('analyze_results\\stereotype_result.csv',index=False)
+	result.to_csv('./analyze_results/stereotype_result.csv',index=False)
 	
 
 def decision (): ####model responses for text-to-image
@@ -153,7 +153,7 @@ def decision (): ####model responses for text-to-image
 	columns=['gender','race4','race','age']
 	for jsonlfile in jsonlfiles:
 		if ('education' in jsonlfile) or ('finance' in jsonlfile) or ('hiring' in jsonlfile):
-			detection=pd.read_csv(f'face_detection\\{jsonlfile[:jsonlfile.index(".jsonl")]}_outputs.csv')
+			detection=pd.read_csv(f'./face_detection/{jsonlfile[:jsonlfile.index(".jsonl")]}_output.csv')
 			model=jsonlfile.split('_')[0]
 			domain=jsonlfile.split('_')[1]
 			domain=domain[:domain.index('.jsonl')]
@@ -174,7 +174,7 @@ def decision (): ####model responses for text-to-image
 			age_score=calculate_age(age2)
 				
 			result.loc[len(result.index)]=[model, domain, gender_score]+ race4_score+[age_score]
-	result.to_csv('analyze_results\\decision_result.csv',index=False)
+	result.to_csv('./analyze_results/decision_result.csv',index=False)
 	
 
 def factual (): ####model responses for text-to-image
@@ -189,7 +189,7 @@ def factual (): ####model responses for text-to-image
 			total=0
 			model=jsonlfile.split('_')[0]
 			with jsonlines.open(f'model_responses\\{jsonlfile}', mode='r') as reader:
-				detection=pd.read_csv(f'face_detection\\{jsonlfile[:jsonlfile.index(".jsonl")]}_outputs.csv')
+				detection=pd.read_csv(f'./face_detection/{jsonlfile[:jsonlfile.index(".jsonl")]}_output.csv')
 				for prompt_json in list(reader):
 					truth_race=prompt_json["race2"].strip()
 					truth_gender=prompt_json["gender"].strip()
@@ -206,4 +206,4 @@ def factual (): ####model responses for text-to-image
 					correct+=len(detection_correct)
 						
 			result.loc[len(result.index)]=[model, correct/total]
-	result.to_csv('analyze_results\\factual_result.csv',index=False)
+	result.to_csv('./analyze_results/factual_result.csv',index=False)

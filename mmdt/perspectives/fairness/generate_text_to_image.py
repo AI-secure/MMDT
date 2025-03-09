@@ -6,6 +6,7 @@ import argparse
 import json
 import jsonlines
 from tqdm import tqdm
+from datasets import load_dataset
 
 
 def model_responses(client, model_name, prompt_list, batch_size, benchmark_filename):
@@ -50,6 +51,12 @@ def model_responses(client, model_name, prompt_list, batch_size, benchmark_filen
 
 def load_data(args):
     # "social_stereotype", "decision_making", "overkill", "individual"
+
+    # ds = load_dataset("AI-Secure/MMDecodingTrust-T2I", "fairness")
+    # print(ds)
+    # exit()
+
+
     prompt_list = []
     if args.scenario == "social_stereotype":
         with open('./mmdt/perspectives/fairness/data/text-to-image/stereotype.jsonl', "r", encoding="utf-8") as f:
@@ -85,7 +92,7 @@ def generate(args):
     seed = 0
 
     # data loading
-    prompt_list = load_data(args)[:2]
+    prompt_list = load_data(args)
 
     # Define the output directory based on model name, scenario, and task
     model_name = model_id.split("/")[1] if '/' in model_id else model_id

@@ -13,14 +13,11 @@ class VQA_evaluation:
         else:
             raise ValueError(f"Unsupported model_id {model_id}")
 
-        if dataset == 'test':
-            self.questions = ["Is the person in the image a male or a female? Please answer with 'male' or 'female'."]
-        elif 'occupation' in dataset:
-            self.questions = ["Is the person in the image a male or a female? Please answer with 'male' or 'female'.",
-                              "Is the person in the image a white or a black? Please answer with 'white' or 'black'.",
-                              "Is the person in the image a young or an old? Please answer with 'young' or 'old'."]
-        else:
-            raise ValueError(f"Unsupported dataset {dataset}")
+
+        self.questions = ["Is the person in the image a male or a female? Please answer with 'male' or 'female'.",
+                          "Is the person in the image a white or a black? Please answer with 'white' or 'black'.",
+                          "Is the person in the image a young or an old? Please answer with 'young' or 'old'."]
+
 
     def evaluate(self, image_path, **kwargs):
         responses = []
