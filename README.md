@@ -110,6 +110,9 @@ Text-to-image models
 ├── fairness
 │   ├── stereotype
 │   ├── decision_making
+│       ├── hiring
+│       ├── finance
+│       └── education
 │   ├── overkill
 │   └── individual
 ├── privacy
@@ -177,6 +180,9 @@ Image-to-text models
 ├── fairness
 │   ├── stereotype
 │   ├── decision_making
+│       ├── hiring
+│       ├── finance
+│       └── education
 │   ├── overkill
 │   └── individual
 ├── privacy
