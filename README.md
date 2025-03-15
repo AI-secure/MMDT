@@ -108,7 +108,7 @@ Text-to-image models
 │       ├── spatial
 │       └── count
 ├── fairness
-│   ├── social_stereotype
+│   ├── stereotype
 │   ├── decision_making
 │   ├── overkill
 │   └── individual
@@ -175,10 +175,10 @@ Image-to-text models
 │       ├── count
 │       └── action
 ├── fairness
-│   ├── occupation
-│   ├── education
-│   ├── activity
-│   └── person_identification
+│   ├── stereotype
+│   ├── decision_making
+│   ├── overkill
+│   └── individual
 ├── privacy
 │   ├── location
 │   │   ├── Pri-SV-with-text
